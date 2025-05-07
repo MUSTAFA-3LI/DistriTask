@@ -5,3 +5,6 @@ resource "aws_internet_gateway" "igw" {
     Name = "igw"
   }
 }
+
+# should i create another igw for the second az?
+
