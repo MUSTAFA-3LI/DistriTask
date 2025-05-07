@@ -4,14 +4,17 @@ from users.models import User
 from django.contrib import messages
 from datetime import datetime
 from django.db.models import Count
-from django.db.models import Q  
+from django.db.models import Q
 
 from django.core.mail import send_mail
 
 from celery import shared_task
 from .tasks import check_deadlines
 
-#function to send emails to employees of  new tasks 
+from django.core.paginator import Paginator
+
+
+# function to send emails to employees of  new tasks
 def send_task_email(employee, task):
     subject = " New Task Assigned to You!"
     message = f"""
@@ -38,22 +41,26 @@ Distritask - Let the right task find the right talent."""
     )
 
 # View tasks of the logged-in employee
+
+
 def employee_tasks(request):
     if request.session.get('user_role') != 'employee':
-        return redirect('users:login')  
+        return redirect('users:login')
 
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('users:login')
 
-    tasks = Task.objects.filter(assigned_to_id=user_id)  
+    tasks = Task.objects.filter(assigned_to_id=user_id)
 
     return render(request, 'tasks/employee_tasks.html', {'tasks': tasks})
 
 # Add a new task (Manager only)
+
+
 def add_task(request):
     if request.session.get('user_role') != 'manager':
-        return redirect('users:login')  
+        return redirect('users:login')
 
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
@@ -78,7 +85,7 @@ def add_task(request):
             return redirect('tasks:manager_tasks')
 
         # Create the task and assign it to the employee
-        task=Task.objects.create(
+        task = Task.objects.create(
             title=title,
             description=description,
             priority=priority,
@@ -87,7 +94,7 @@ def add_task(request):
             assigned_to=suitable_employee
         )
         messages.success(request, "Task added successfully.")
-        
+
         # Send task assignment email
         send_task_email(suitable_employee, task)
 
@@ -96,10 +103,10 @@ def add_task(request):
     return redirect('tasks:manager_tasks')
 
 
-#manager update task
+# manager update task
 def update_task(request, task_id):
     if request.session.get('user_role') != 'manager':
-        return redirect('users:login')  
+        return redirect('users:login')
 
     task = get_object_or_404(Task, id=task_id)
 
@@ -119,7 +126,7 @@ def update_task(request, task_id):
         if status in ['pending', 'in_progress', 'completed', 'delayed']:
             task.status = status
         if deadline:
-                task.deadline = deadline
+            task.deadline = deadline
 
         task.save()
         messages.success(request, "Task updated successfully.")
@@ -128,9 +135,11 @@ def update_task(request, task_id):
     return redirect('tasks:manager_tasks')
 
 # Update task status (Employee only)
+
+
 def update_task_status(request, task_id):
     if request.session.get('user_role') != 'employee':
-        return redirect('users:login')  
+        return redirect('users:login')
 
     user_id = request.session.get('user_id')
     task = get_object_or_404(Task, id=task_id)
@@ -141,7 +150,7 @@ def update_task_status(request, task_id):
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        if new_status in ['pending', 'in_progress', 'completed', 'delayed']:  
+        if new_status in ['pending', 'in_progress', 'completed', 'delayed']:
             task.status = new_status
             task.save()
             messages.success(request, "Task status updated successfully.")
@@ -151,6 +160,8 @@ def update_task_status(request, task_id):
     return redirect('tasks:employee_tasks')
 
 # Delete a task (Manager only)
+
+
 def delete_task(request, task_id):
     if request.session.get('user_role') != 'manager':
         return redirect('users:login')
@@ -161,25 +172,35 @@ def delete_task(request, task_id):
 
     return redirect('tasks:manager_tasks')
 
-#LOGOUT
+# LOGOUT
+
+
 def log_out(request):
-    request.session.flush()  
-    return redirect("users:login")  
+    request.session.flush()
+    return redirect("users:login")
 
 # this function used in get employees in manger page and thier tasks
+
+
 def manager_tasks(request):
 
     # check_deadlines.delay()
-    
+
     # Check if the user is a manager; if not, redirect to the login page
     if request.session.get('user_role') != 'manager':
-        return redirect('users:login')  
+        return redirect('users:login')
 
     # Fetch all tasks from the database
     tasks = Task.objects.all()
 
+    # Implement pagination
+    paginator = Paginator(tasks, 6)  # Show 10 tasks per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     # Fetch unique categories from the Task model
-    categories = User.objects.values_list('category', flat=True).distinct()  #pass category to manager page
+    categories = User.objects.values_list(
+        'category', flat=True).distinct()  # pass category to manager page
 
     # Fetch all employees (users with the role 'employee')
     employees = User.objects.filter(role='employee')
@@ -191,12 +212,14 @@ def manager_tasks(request):
     for employee in employees:
         # Count total tasks assigned to the employee
         total_tasks = Task.objects.filter(assigned_to=employee).count()
-        
+
         # Count delayed tasks assigned to the employee
-        delayed_tasks = Task.objects.filter(assigned_to=employee, status='delayed').count()
-        
+        delayed_tasks = Task.objects.filter(
+            assigned_to=employee, status='delayed').count()
+
         # Count completed tasks assigned to the employee
-        completed_tasks = Task.objects.filter(assigned_to=employee, status='completed').count()
+        completed_tasks = Task.objects.filter(
+            assigned_to=employee, status='completed').count()
 
         # Add the employee's data to the list
         employee_data.append({
@@ -208,10 +231,10 @@ def manager_tasks(request):
             'completed_tasks': completed_tasks,
         })
 
-    # Pass the data to the template
+    # Pass the paginated tasks to the template
     return render(request, 'tasks/manager_tasks.html', {
-        'tasks': tasks,
+        'page_obj': page_obj,
         'employees': employees,
-        'employee_data': employee_data,  # Pass employee data to the template
-        'categories': categories ,
-})
+        'employee_data': employee_data,  # Pass employee data to the template
+        'categories': categories,
+    })

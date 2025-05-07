@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +12,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
     <!-- System Messages -->
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
-            </div>
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
@@ -50,15 +52,19 @@
                 <h2>📊 User Dashboard</h2>
                 <ul>
                     <li><a href="#" onclick="filterTasks('all')"><i class="fas fa-tasks"></i> All Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('pending')"><i class="fas fa-calendar-alt"></i> Pending Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('in_progress')"><i class="fas fa-calendar-day"></i> In Progress Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('delayed')"><i class="fas fa-exclamation-triangle"></i> Delayed Tasks</a></li>
+                    <li><a href="#" onclick="filterTasks('pending')"><i class="fas fa-calendar-alt"></i> Pending
+                            Tasks</a></li>
+                    <li><a href="#" onclick="filterTasks('in_progress')"><i class="fas fa-calendar-day"></i> In Progress
+                            Tasks</a></li>
+                    <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed
+                            Tasks</a></li>
+                    <li><a href="#" onclick="filterTasks('delayed')"><i class="fas fa-exclamation-triangle"></i> Delayed
+                            Tasks</a></li>
                 </ul>
 
-                 <!-- user change passeod -->
-                 <li><a href="{% url 'users:change_password' %}" class="logout-btn" >Change Password</a></li>
- 
+                <!-- user change passeod -->
+                <li><a href="{% url 'users:change_password' %}" class="logout-btn">Change Password</a></li>
+
 
                 <a href="#" class="logout-btn" onclick="logout()" style="text-decoration: none;">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -70,27 +76,48 @@
                 <h1>📌 My Tasks</h1>
                 <div class="task-list tasks-grid">
                     {% if tasks %}
-                        {% for task in tasks %}
-                        <div class="task-item {{ task.priority }}" data-status="{{ task.status }}">
-                            <h3>{{ task.title }}</h3>
-                            <p>{{ task.description }}</p>
-                            <p><strong>Assigned to:</strong> {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}</p>
-                            <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-                            <p><strong>Status:</strong> {{ task.get_status_display }}</p>
-                            <p><strong>Deadline:</strong> <span id="deadline-{{ task.id }}">{{ task.deadline }}</span></p>
-                            <p><strong>Time Remaining:</strong> <span id="countdown-{{ task.id }}"></span></p>
-                            {% if task.status != 'completed' %}
-                            <form action="{% url 'tasks:update_task_status' task.id %}" method="post" onsubmit="completeTask(event, '{{ task.id }}')">
-                                {% csrf_token %}
-                                <input type="hidden" name="status" value="completed">
-                                <button type="submit" class="complete-btn">✅ Complete</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
+                    {% for task in tasks %}
+                    <div class="task-item {{ task.priority }}" data-status="{{ task.status }}">
+                        <h3>{{ task.title }}</h3>
+                        <p>{{ task.description }}</p>
+                        <p><strong>Assigned to:</strong> {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name
+                            }}</p>
+                        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+                        <p><strong>Status:</strong> {{ task.get_status_display }}</p>
+                        <p><strong>Deadline:</strong> <span id="deadline-{{ task.id }}">{{ task.deadline }}</span></p>
+                        <p><strong>Time Remaining:</strong> <span id="countdown-{{ task.id }}"></span></p>
+                        {% if task.status != 'completed' %}
+                        <form action="{% url 'tasks:update_task_status' task.id %}" method="post"
+                            onsubmit="completeTask(event, '{{ task.id }}')">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" class="complete-btn">✅ Complete</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        📋 No tasks available
+                    📋 No tasks available
                     {% endif %}
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo;</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">&#8249;</a>
+                        {% endif %}
+
+                        <span class="current">
+                            {{ page_obj.number }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">&#8250;</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                        {% endif %}
+                    </span>
                 </div>
             </div>
         </div>
@@ -111,7 +138,7 @@
                 }, 5000); // 5 seconds delay
             });
         }
-    
+
         // Function to confirm logout using SweetAlert2
         function logout() {
             Swal.fire({
@@ -129,7 +156,7 @@
                 }
             });
         }
-    
+
         // Function to filter tasks by status
         function filterTasks(status) {
             console.log("Filtering tasks by status:", status); // Debugging
@@ -143,20 +170,20 @@
                 }
             });
         }
-    
+
         // Function to parse deadline
         function parseDeadline(deadline) {
             // إذا كان التاريخ بتنسيق ISO (مثل "2025-03-28T08:32")
             if (deadline.includes("T")) {
                 return new Date(deadline);
             }
-    
+
             // إذا كان التاريخ بتنسيق نصي (مثل "March 28, 2025, 8:32 a.m.")
             const months = {
                 "January": 0, "February": 1, "March": 2, "April": 3, "May": 4, "June": 5,
                 "July": 6, "August": 7, "September": 8, "October": 9, "November": 10, "December": 11
             };
-    
+
             const parts = deadline.split(/[\s,]+/);
             const month = months[parts[0]];
             const day = parseInt(parts[1], 10);
@@ -165,44 +192,44 @@
             let hour = parseInt(timeParts[0], 10);
             const minute = parseInt(timeParts[1], 10);
             const period = parts[4];
-    
+
             // Convert to 24-hour format
             if (period === "p.m." && hour !== 12) {
                 hour += 12;
             } else if (period === "a.m." && hour === 12) {
                 hour = 0;
             }
-    
+
             return new Date(year, month, day, hour, minute);
         }
-    
+
         // Function to calculate time remaining
         function updateCountdown(taskId, deadline) {
             const countdownElement = document.getElementById(`countdown-${taskId}`);
             if (!countdownElement) return;
-    
+
             const deadlineDate = parseDeadline(deadline);
             if (isNaN(deadlineDate.getTime())) {
                 countdownElement.textContent = "Invalid deadline!";
                 return;
             }
-    
+
             const now = new Date().getTime();
             const timeRemaining = deadlineDate.getTime() - now;
-    
+
             if (timeRemaining <= 0) {
                 countdownElement.textContent = "Deadline passed!";
                 return;
             }
-    
+
             const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
             const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-    
+
             countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }
-    
+
         // Function to initialize countdowns
         function initializeCountdowns() {
             document.querySelectorAll('.task-item').forEach(task => {
@@ -212,11 +239,11 @@
                 setInterval(() => updateCountdown(taskId, deadline), 1000);
             });
         }
-    
+
         // Function to confirm task completion using SweetAlert2
         function completeTask(event, taskId) {
             event.preventDefault(); // Prevent the form from submitting immediately
-    
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you want to mark this task as completed?",
@@ -235,7 +262,7 @@
                             status: "completed",
                             csrfmiddlewaretoken: "{{ csrf_token }}"
                         },
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire(
                                 'Completed!',
                                 'The task has been marked as completed.',
@@ -244,7 +271,7 @@
                                 location.reload(); // Refresh the page after completion
                             });
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             Swal.fire(
                                 'Error!',
                                 'Failed to update task status.',
@@ -255,12 +282,13 @@
                 }
             });
         }
-    
+
         // Run the function when the page loads
-        window.onload = function() {
+        window.onload = function () {
             initializeCountdowns();
             hideMessages();
         };
     </script>
 </body>
+
 </html>

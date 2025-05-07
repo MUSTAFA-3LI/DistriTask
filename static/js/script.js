@@ -113,6 +113,21 @@ function logout() {
     // If user cancels, do nothing
 }
 
+function toggleDropdown() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close the dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('userDropdown');
+    const profile = document.querySelector('.profile');
+    
+    if (!profile.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
 
 
 

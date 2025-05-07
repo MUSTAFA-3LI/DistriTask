@@ -1,6 +1,7 @@
-{% load static %}  
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +12,16 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
     <!-- System Messages -->
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                {{ message }}
-                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
-            </div>
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
@@ -39,15 +41,77 @@
 
             <!-- Search Section -->
             <div class="search-section">
-                <input type="text" placeholder="Search tasks..." class="search-input">
+                <input type="text" placeholder="Search tasks..." class="search-input" onkeyup="searchTasks(this.value)">
                 <i class="fas fa-search search-icon"></i>
             </div>
 
             <!-- Header Right -->
             <div class="header-right">
-                <div class="profile">
-                    <img src="{% static 'imgs/image_admin/picture_admin.webp' %}" alt="Profile" class="profile-pic">
-                    <span class="profile-name">{{ request.session.user_name }}</span>
+                <!-- notification list -->
+                <div class="dropdown">
+                    <button class="dropdown-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read">Mark all as read</button>
+                        </div>
+                        <div class="notification-list">
+                            <div class="notification-item unread">
+                                <i class="fas fa-tasks"></i>
+                                <div class="notification-text">
+                                    <p>New task assigned: "Update website content"</p>
+                                    <span class="notification-time">2 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div class="notification-text">
+                                    <p>Task "Client meeting" is due in 1 hour</p>
+                                    <span class="notification-time">15 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <i class="fas fa-check-circle"></i>
+                                <div class="notification-text">
+                                    <p>Task "Project review" has been completed</p>
+                                    <span class="notification-time">1 hour ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="#">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Profile Dropdown -->
+                <div class="dropdown profile-dropdown">
+                    <button class="dropdown-btn profile-btn">
+                        <img src="{% static 'imgs/image_admin/picture_admin.webp' %}" alt="Profile" class="profile-pic">
+                        <span class="profile-name">{{ request.session.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content profile-content">
+                        <div class="profile-info">
+                            <img src="{% static 'imgs/image_admin/picture_admin.webp' %}" alt="Profile"
+                                class="profile-pic-large">
+                            <div class="profile-details">
+                                <h3>{{ request.session.user_name }}</h3>
+                                <p>Administrator</p>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'users:change_password' %}" class="dropdown-item">
+                            <i class="fas fa-key"></i>
+                            <span>Change Password</span>
+                        </a>
+                        <a href="#" class="dropdown-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -57,155 +121,123 @@
             <h2>📊 Dashboard</h2>
             <ul>
                 <li><a href="#" onclick="filterTasks('all')"><i class="fas fa-tasks"></i> All Tasks</a></li>
-                <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed</a></li>
+                <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed</a>
+                </li>
                 <li><a href="#" onclick="filterTasks('delayed')"><i class="fas fa-clock"></i> Delayed</a></li>
                 <li><a href="#" onclick="filterTasks('in_progress')"><i class="fas fa-cogs"></i> In Progress</a></li>
-                <li><a href="#" onclick="filterTasks('Pending')"><i class="fas fa-cogs"></i> Pending</a></li>
+                <li><a href="#" onclick="filterTasks('pending')"><i class="fas fa-hourglass-half"></i> Pending</a></li>
+                <li><a href="#" onclick="showTaskForm()"><i class="fas fa-plus"></i> Add Task</a></li>
             </ul>
-            <button class="add-task-btn" onclick="showTaskForm()"><i class="fas fa-plus"></i> Add Task</button>
-
-             <!-- user change passeod -->
-             <li><a href="{% url 'users:change_password' %}" class="logout-btn" >Change Password</a></li>
-
-             
-            <a href="#" class="logout-btn" onclick="logout()" style="text-decoration: none;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            <div class="sidebar-buttons">
+                <a href="{% url 'users:change_password' %}" class="change-password-link">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+                <a href="#" class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
         </div>
 
         <!-- Main Content -->
         <div class="main-content">
             <h1>📌 Task Management</h1>
 
-            <!-- Task Form (Initially Hidden) -->
-            <div id="taskForm" class="task-form" style="display: none;">
-                <h3 id="formTitle">➕ Add New Task</h3>
-                <form method="POST" id="taskFormElement" action="{% url 'tasks:add_task' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="task_id" id="taskId">
-
-                    <!-- Task Category Dropdown -->
-                    <label>📂 Task Category:</label>
-                    <select name="category" required>
-                        {% for category in categories %}
-                            <option value="{{ category }}">{{ category }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <label>✍️ Task Name:</label>
-                    <input type="text" name="title" id="taskTitle" placeholder="Enter task name" required>
-
-                    <label>📝 Task Description:</label>
-                    <textarea name="description" id="taskDescription" placeholder="Enter task description"></textarea>
-
-                    <label>🔥 Priority:</label>
-                    <select name="priority" id="taskPriority">
-                        <option value="low">🟢 Low</option>
-                        <option value="medium">🟠 Medium</option>
-                        <option value="high">🔴 High</option>
-                        <option value="urgent">🚨 Urgent</option>
-                    </select>
-
-                    <!-- Add Deadline Field -->
-                    <label>⏰ Deadline:</label>
-                    <input type="datetime-local" name="deadline" id="taskDeadline" required>
-
-                    <div class="form-buttons">
-                        <button type="submit" id="submitButton"><i class="fas fa-check"></i> Add</button>
-                        <button type="button" onclick="hideTaskForm()"><i class="fas fa-times"></i> Cancel</button>
-                    </div>
-                </form>
-            </div>
-
             <!-- Tasks Banner -->
             <div class="tasks-banner">
                 <h2>📋 Tasks Overview</h2>
                 <div id="taskList" class="task-list">
-                    {% if tasks %}
-                        {% for task in tasks %}
-                            <div class="task-card {{ task.status }} {{ task.priority }}" data-status="{{ task.status }}">
-                                <h3>{{ task.title }}</h3>
-                                <p>{{ task.description }}</p>
-                                <p><strong>Assigned to:</strong> {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}</p>
-                                <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-                                <p><strong>Status:</strong> {{ task.get_status_display }}</p>
-                                <p><strong>Created At:</strong> {{ task.created_at }}</p>
-                                <p><strong>Deadline:</strong> <span id="deadline-{{ task.id }}">{{ task.deadline }}</span></p>
-                                <p><strong>Time Remaining:</strong> <span id="countdown-{{ task.id }}"></span></p>
-
-                                <!-- Update Task Button -->
-                                <button class="update-task-btn" onclick="showTaskForm('{{ task.id }}', '{{ task.title }}', '{{ task.description }}', '{{ task.priority }}', '{{ task.status }}', '{{ task.deadline }}')">
-                                    <i class="fas fa-edit"></i> Update
+                    {% if page_obj %}
+                    {% for task in page_obj %}
+                    <div class="task-card {{ task.status }} {{ task.priority }}" data-status="{{ task.status }}">
+                        <div class="task-card-content">
+                            <h3>{{ task.title }}</h3>
+                            <p>{{ task.description }}</p>
+                            <p><strong>Assigned to:</strong> {{ task.assigned_to.first_name }} {{  task.assigned_to.last_name }}</p>
+                            <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+                            <p><strong>Status:</strong> {{ task.get_status_display }}</p>
+                            <p><strong>Created At:</strong> {{ task.created_at }}</p>
+                            <p><strong>Deadline:</strong> <span id="deadline-{{ task.id }}">{{ task.deadline }}</span>
+                            </p>
+                            <p><strong>Time Remaining:</strong> <span id="countdown-{{ task.id }}"></span></p>
+                        </div>
+                        <div class="task-card-buttons">
+                            <button class="update-task-btn"
+                                onclick="showTaskForm('{{ task.id }}', '{{ task.title }}', '{{ task.description }}', '{{ task.priority }}', '{{ task.status }}', '{{ task.deadline }}')">
+                                <i class="fas fa-edit"></i> Update
+                            </button>
+                            <form method="POST" action="{% url 'tasks:delete_task' task.id %}"
+                                style="display: inline; flex: 1;" id="deleteForm-{{ task.id }}">
+                                {% csrf_token %}
+                                <button type="button" class="delete-task-btn"
+                                    onclick="confirmDeleteTask('{{ task.id }}')">
+                                    <i class="fas fa-trash"></i> Delete
                                 </button>
-
-                                <!-- Delete Task Button -->
-                                <form method="POST" action="{% url 'tasks:delete_task' task.id %}" style="display: inline;" id="deleteForm-{{ task.id }}">
-                                    {% csrf_token %}
-                                    <button type="button" class="delete-task-btn" onclick="confirmDeleteTask('{{ task.id }}')">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </div>
-                        {% endfor %}
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        📋 No tasks available
+                    📋 No tasks available
                     {% endif %}
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo;</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">&#8249;</a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <span class="current">{{ num }}</span>
+                        {% else %}
+                        <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"> &#8250;</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a>
+                        {% endif %}
+                    </span>
                 </div>
             </div>
 
             <!-- Employees Section -->
             <div class="employees-section">
-                <h2>👥 Employees Overview</h2>
+                <h2>Employees Overview</h2>
                 <div class="employees-list">
                     {% for data in employee_data %}
-                        <div class="employee-card">
-                            <h3>{{ data.first_name }} {{ data.last_name }}</h3>
-                            <p><strong>Total Tasks:</strong> {{ data.total_tasks }}</p>
-                            <p><strong>Delayed Tasks:</strong> {{ data.delayed_tasks }}</p>
-                            <p><strong>Completed Tasks:</strong> {{ data.completed_tasks }}</p>
-                        </div>
+                    <div class="employee-card">
+                        <h3>{{ data.first_name }} {{ data.last_name }}</h3>
+                        <p>
+                            <strong>Total Tasks:</strong>
+                            <span class="task-count total-tasks">{{ data.total_tasks }}</span>
+                        </p>
+                        <p>
+                            <strong>Delayed Tasks:</strong>
+                            <span class="task-count delayed-tasks">{{ data.delayed_tasks }}</span>
+                        </p>
+                        <p>
+                            <strong>Completed Tasks:</strong>
+                            <span class="task-count completed-tasks">{{ data.completed_tasks }}</span>
+                        </p>
+                    </div>
                     {% empty %}
-                        <p>No employees found.</p>
+                    <div class="employee-card">
+                        <h3>No Employees</h3>
+                        <p>There are no employees assigned to tasks yet.</p>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
 
-
-
-
         <script>
-            // Function to show the form for adding or updating a task
-            function showTaskForm(taskId = null, title = "", description = "", priority = "low", status = "pending", deadline = "") {
-                const form = document.getElementById("taskForm");
-                const formTitle = document.getElementById("formTitle");
-                const submitButton = document.getElementById("submitButton");
-                const taskFormElement = document.getElementById("taskFormElement");
-
-                if (taskId) {
-                    // Update mode
-                    formTitle.textContent = "✏️ Update Task";
-                    submitButton.innerHTML = '<i class="fas fa-save"></i> Save';
-                    taskFormElement.action = `{% url 'tasks:update_task' 0 %}`.replace("0", taskId);
-                } else {
-                    // Add mode
-                    formTitle.textContent = "➕ Add New Task";
-                    submitButton.innerHTML = '<i class="fas fa-check"></i> Add';
-                    taskFormElement.action = "{% url 'tasks:add_task' %}";
-                }
-
-                // Populate form fields
-                document.getElementById("taskId").value = taskId || "";
-                document.getElementById("taskTitle").value = title;
-                document.getElementById("taskDescription").value = description;
-                document.getElementById("taskPriority").value = priority;
-                document.getElementById("taskDeadline").value = deadline ? parseDeadline(deadline).toISOString().slice(0, 16) : "";
-                // Show the form
-                form.style.display = "block";
-            }
-
-            // Logout Function
+            // Function to handle logout
             function logout() {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -221,6 +253,120 @@
                         window.location.href = "{% url 'tasks:log_out' %}";
                     }
                 });
+            }
+
+            // Function to search tasks
+            function searchTasks(searchTerm) {
+                const tasks = document.querySelectorAll('.task-card');
+                searchTerm = searchTerm.toLowerCase();
+
+                tasks.forEach(task => {
+                    const title = task.querySelector('h3').textContent.toLowerCase();
+                    const description = task.querySelector('p').textContent.toLowerCase();
+                    const assignedTo = task.querySelector('p:nth-child(3)').textContent.toLowerCase();
+                    const priority = task.querySelector('p:nth-child(4)').textContent.toLowerCase();
+                    const status = task.querySelector('p:nth-child(5)').textContent.toLowerCase();
+
+                    if (title.includes(searchTerm) ||
+                        description.includes(searchTerm) ||
+                        assignedTo.includes(searchTerm) ||
+                        priority.includes(searchTerm) ||
+                        status.includes(searchTerm)) {
+                        task.style.display = 'block';
+                    } else {
+                        task.style.display = 'none';
+                    }
+                });
+            }
+
+            // Function to show the form for adding or updating a task
+            function showTaskForm(taskId = null, title = "", description = "", priority = "low", status = "pending", deadline = "") {
+                const isUpdate = taskId !== null;
+                const formTitle = isUpdate ? "✏️ Update Task" : "➕ Add New Task";
+                const submitText = isUpdate ? "Save" : "Add";
+                const formAction = isUpdate ? `{% url 'tasks:update_task' 0 %}`.replace("0", taskId) : "{% url 'tasks:add_task' %}";
+
+                Swal.fire({
+                    title: formTitle,
+                    html: `
+                        <form id="taskForm" method="POST" action="${formAction}" class="task-form-popup">
+                            {% csrf_token %}
+                            <input type="hidden" name="task_id" value="${taskId || ''}">
+                            
+                            <div class="form-group">
+                                <label>📂 Task Category:</label>
+                                <select name="category" required class="swal2-input">
+                                    {% for category in categories %}
+                                    <option value="{{ category }}">{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>✍️ Task Name:</label>
+                                <input type="text" name="title" value="${title}" placeholder="Enter task name" required class="swal2-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label>📝 Task Description:</label>
+                                <textarea name="description" placeholder="Enter task description" class="swal2-textarea">${description}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>🔥 Priority:</label>
+                                <select name="priority" class="swal2-input">
+                                    <option value="low" ${priority === 'low' ? 'selected' : ''}>🟢 Low</option>
+                                    <option value="medium" ${priority === 'medium' ? 'selected' : ''}>🟠 Medium</option>
+                                    <option value="high" ${priority === 'high' ? 'selected' : ''}>🔴 High</option>
+                                    <option value="urgent" ${priority === 'urgent' ? 'selected' : ''}>🚨 Urgent</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>⏰ Deadline:</label>
+                                <input type="datetime-local" name="deadline" value="${deadline ? parseDeadline(deadline).toISOString().slice(0, 16) : ''}" required class="swal2-input">
+                            </div>
+                        </form>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: submitText,
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        const form = document.getElementById('taskForm');
+                        return fetch(form.action, {
+                            method: 'POST',
+                            body: new FormData(form)
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(response.statusText);
+                                }
+                                return response;
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: isUpdate ? 'Task Updated!' : 'Task Added!',
+                            text: isUpdate ? 'Your task has been updated successfully.' : 'Your task has been added successfully.',
+                            icon: 'success'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                });
+            }
+
+            // Function to parse deadline string to Date object
+            function parseDeadline(deadline) {
+                return new Date(deadline);
             }
 
             // Function to confirm task deletion
@@ -242,7 +388,7 @@
             }
 
             // Initialize on page load
-            window.onload = function() {
+            window.onload = function () {
                 initializeCountdowns();
                 hideMessages();
             };
@@ -250,4 +396,5 @@
         <script src="{% static 'js/script.js' %}"></script>
     </div>
 </body>
+
 </html>
