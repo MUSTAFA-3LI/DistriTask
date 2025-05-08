@@ -86,37 +86,22 @@ resource "aws_instance" "private_instance_1_az1" {
 
   user_data = <<-EOF
               #!/bin/bash
-
-              # Wait for the device to appear
               while [ ! -e /dev/nvme1n1 ]; do
                 sleep 1
               done
-
-              # Check if the volume has a filesystem; format it as ext4 if not
               if ! blkid /dev/nvme1n1; then
                 mkfs -t ext4 /dev/nvme1n1
               fi
-
-              # Create the target mount directory if it doesn't exist
+              VOLUME_UUID=$(blkid -s UUID -o value /dev/nvme1n1)
               mkdir -p /data/mysql
-
-              # Mount the volume only if it's not already mounted
-              if ! mountpoint -q /data/mysql; then
-                mount /dev/nvme1n1 /data/mysql
-              fi
-
-              # Add the mount configuration to /etc/fstab if it's not already there
-              grep -q '/data/mysql' /etc/fstab || echo '/dev/nvme1n1 /data/mysql ext4 defaults,nofail 0 2' >> /etc/fstab
+              mount UUID=$VOLUME_UUID /data/mysql
+              grep -q '/data/mysql' /etc/fstab || echo "UUID=$VOLUME_UUID /data/mysql ext4 defaults,nofail 0 2" >> /etc/fstab
               EOF
 
   tags = {
     Name = "private_instance_1_az1"
   }
 }
-
-
-
-
 
 
 
