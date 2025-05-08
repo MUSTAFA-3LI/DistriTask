@@ -1,0 +1,72 @@
+# DATA ON DOCKER CONTAINER
+
+# services:
+#   db:
+#     image: mysql:8.0
+#     container_name: mysql_db
+#     restart: always
+#     env_file:
+#       - .env
+#     environment:
+#       MYSQL_DATABASE: ${MYSQL_DATABASE}
+#       MYSQL_USER: ${MYSQL_USER}
+#       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+# volumes:
+#   db_data:
+
+# DATA ON EBS
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+# SYNCHRONOUS REPLICATION AND MASTER-SLAVE SETUP
+
+# services:
+#   db_master:
+#     image: mysql:8.0
+#     container_name: mysql_master
+#     restart: always
+#     env_file:
+#       - .env
+#     environment:
+#       MYSQL_DATABASE: ${MYSQL_DATABASE}
+#       MYSQL_USER: ${MYSQL_USER}
+#       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - /data/mysql:/var/lib/mysql # Link to EBS
+
+#   db_slave:
+#     image: mysql:8.0
+#     container_name: mysql_replica
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - /data/mysql:/var/lib/mysql # Link to EBS

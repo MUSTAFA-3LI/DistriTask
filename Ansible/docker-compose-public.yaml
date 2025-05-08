@@ -1,0 +1,35 @@
+services:
+  redis:
+    image: redis:7.0
+    container_name: redis
+
+  djangoserver:
+    env_file:
+      - .env
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile.distritask
+    command: >
+      sh -c "sleep 15 && python3 manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  celery:
+    env_file:
+      - .env
+    container_name: celery
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    command: celery -A TaskManager worker -l INFO
+    restart: always
+    depends_on:
+      - redis
+      - djangoserver
+    volumes:
+      - .:/app

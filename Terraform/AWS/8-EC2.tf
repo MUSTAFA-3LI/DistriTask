@@ -45,19 +45,19 @@ resource "aws_instance" "public_instance_1_az1" {
   associate_public_ip_address = true
 }
 
-# resource "aws_instance" "public_instance_2_az1" {
-#   ami                    = "ami-04a81a99f5ec58529"
-#   instance_type          = "t3.medium"
-#   key_name               = aws_key_pair.SSH_key.key_name
-#   subnet_id              = aws_subnet.public_subnet_a.id
-#   vpc_security_group_ids = [aws_security_group.public_sg.id]
+resource "aws_instance" "public_instance_2_az1" {
+  ami                    = "ami-04a81a99f5ec58529"
+  instance_type          = "t3.medium"
+  key_name               = aws_key_pair.SSH_key.key_name
+  subnet_id              = aws_subnet.public_subnet_a.id
+  vpc_security_group_ids = [aws_security_group.public_sg.id]
 
-#   tags = {
-#     Name = "public_instance_2_az1"
-#   }
+  tags = {
+    Name = "public_instance_2_az1"
+  }
 
-#   associate_public_ip_address = true
-# }
+  associate_public_ip_address = true
+}
 
 # resource "aws_instance" "public_instance_3_az1" {
 #   ami                    = "ami-04a81a99f5ec58529"
@@ -106,58 +106,50 @@ resource "aws_instance" "private_instance_1_az1" {
 
 
 # EC2 instance in public subnet in AZ2
-# resource "aws_instance" "public_instance_1_az2" {
-#   ami                    = "ami-04a81a99f5ec58529"
-#   instance_type          = "t3.medium"
-#   key_name               = aws_key_pair.SSH_key.key_name
-#   subnet_id              = aws_subnet.public_subnet_b.id
-#   vpc_security_group_ids = [aws_security_group.public_sg.id]
+resource "aws_instance" "public_instance_1_az2" {
+  ami                    = "ami-04a81a99f5ec58529"
+  instance_type          = "t3.medium"
+  key_name               = aws_key_pair.SSH_key.key_name
+  subnet_id              = aws_subnet.public_subnet_b.id
+  vpc_security_group_ids = [aws_security_group.public_sg.id]
 
-#   tags = {
-#     Name = "public_instance_1_az2"
-#   }
+  tags = {
+    Name = "public_instance_1_az2"
+  }
 
-#   associate_public_ip_address = true
-# }
+  associate_public_ip_address = true
+}
 
 # EC2 instance in private subnet in AZ2
 # Configure the instance to mount the volume automatically on boot
 
-# resource "aws_instance" "private_instance_1_az2" {
-#   ami                    = "ami-04a81a99f5ec58529"
-#   instance_type          = "t3.medium"
-#   key_name               = aws_key_pair.SSH_key.key_name
-#   subnet_id              = aws_subnet.private_subnet_b.id
-#   vpc_security_group_ids = [aws_security_group.private_sg.id]
+resource "aws_instance" "private_instance_1_az2" {
+  ami                    = "ami-04a81a99f5ec58529"
+  instance_type          = "t3.medium"
+  key_name               = aws_key_pair.SSH_key.key_name
+  subnet_id              = aws_subnet.private_subnet_b.id
+  vpc_security_group_ids = [aws_security_group.private_sg.id]
 
-#   associate_public_ip_address = false
+  associate_public_ip_address = false
 
-#   user_data = <<-EOF
-#               #!/bin/bash
+  user_data = <<-EOF
+              #!/bin/bash
+              while [ ! -e /dev/nvme1n1 ]; do
+                sleep 1
+              done
+              if ! blkid /dev/nvme1n1; then
+                mkfs -t ext4 /dev/nvme1n1
+              fi
+              VOLUME_UUID=$(blkid -s UUID -o value /dev/nvme1n1)
+              mkdir -p /data/mysql
+              mount UUID=$VOLUME_UUID /data/mysql
+              grep -q '/data/mysql' /etc/fstab || echo "UUID=$VOLUME_UUID /data/mysql ext4 defaults,nofail 0 2" >> /etc/fstab
+              EOF
 
-#               # Check if the volume has a filesystem; format it as ext4 if not
-#               if ! blkid /dev/nvme1n1; then
-#                 mkfs -t ext4 /dev/nvme1n1
-#               fi
-
-#               # Create the target mount directory if it doesn't exist
-#               mkdir -p /data/mysql
-
-#               # Mount the volume only if it's not already mounted
-#               if ! mountpoint -q /data/mysql; then
-#                 mount /dev/nvme1n1 /data/mysql
-#               fi
-
-#               # Add the mount configuration to /etc/fstab if it's not already there
-#               grep -q '/data/mysql' /etc/fstab || echo '/dev/nvme1n1 /data/mysql ext4 defaults,nofail 0 2' >> /etc/fstab
-#               EOF
-
-
-
-#   tags = {
-#     Name = "private_instance_1_az2"
-#   }
-# }
+  tags = {
+    Name = "private_instance_1_az2"
+  }
+}
 
 
 

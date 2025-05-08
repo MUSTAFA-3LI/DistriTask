@@ -1,5 +1,5 @@
 - name: Setup environment on virtual machines
-  hosts: aws
+  hosts: all
   become: true
   tasks:
     - name: Update package list
@@ -15,11 +15,26 @@
           - python3
           - python3-venv
           - python3-pip
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - apt-transport-https
         state: present
 
-    - name: Install Docker
-      ansible.builtin.apt:
-        name: docker.io
+    - name: Download Docker installation script
+      ansible.builtin.get_url:
+        url: https://get.docker.com
+        dest: /tmp/get-docker.sh
+        mode: '0755'
+
+    - name: Install Docker using official script
+      ansible.builtin.shell: /tmp/get-docker.sh
+      args:
+        creates: /usr/bin/docker
+
+    - name: Create docker group
+      ansible.builtin.group:
+        name: docker
         state: present
 
     - name: Add user to Docker group
@@ -34,15 +49,53 @@
         state: started
         enabled: true
 
-    - name: Pull Docker image from DockerHub
-      docker_image:
-        name: mustafa3li/distritask:latest
-        source: pull
+    - name: Install Docker Compose
+      ansible.builtin.apt:
+        name: docker-compose-plugin
+        state: present
+        update_cache: true
 
-    - name: Run Docker container
-      community.general.docker_container:
-        name: taskmanger_container
-        image: mustafa3li/distritask:latest
-        state: started
-        ports:
-          - "8000:8000"
+    - name: Create application directory
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/DistriTask
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Clone repository
+      ansible.builtin.git:
+        repo: https://github.com/MUSTAFA-3LI/DistriTask.git
+        dest: /home/{{ ansible_user }}/DistriTask
+        version: main
+        force: true
+      become_user: "{{ ansible_user }}"
+
+    - name: Replace docker-compose.yaml for public instances
+      ansible.builtin.copy:
+        src: docker-compose-public.yaml
+        dest: /home/{{ ansible_user }}/DistriTask/docker-compose.yaml
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        force: true
+      when: "'public' in group_names"
+
+    - name: Replace docker-compose.yaml for private instances
+      ansible.builtin.copy:
+        src: docker-compose-private.yaml
+        dest: /home/{{ ansible_user }}/DistriTask/docker-compose.yaml
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        force: true
+      when: "'private' in group_names"
+
+
+    # - name: Run Docker container
+    #   community.general.docker_container:
+    #     name: DistriTask_container
+    #     image: mustafa3li/distritask:latest
+    #     state: started
+    #     ports:
+    #       - "8000:8000"
