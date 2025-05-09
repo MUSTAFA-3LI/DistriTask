@@ -22,7 +22,7 @@ class Command(BaseCommand):
             {
                 'first_name': 'Yoused',
                 'last_name': 'Mostafa',
-                'email': 'yoused@example.com',
+                'email': 'youssifmostafa192@gmail.com',
                 'password': '12345',
                 'role': 'employee',
                 'category': 'Frontend',
@@ -99,6 +99,11 @@ class Command(BaseCommand):
                 'assigned_to': user_objects['oreof00024@gmail.com'],
             },
             {
+            'title': 'Send Task Details via Email',
+            'description': 'An email sent to employees with the assigned task details.',
+            'assigned_to': user_objects['oreof00024@gmail.com'],
+            },
+            {
                 'title': 'Implement Celery for Periodic Task Status Checks',
                 'description': 'Set up Celery with Django to run periodic tasks that check and update the status of ongoing tasks regulary.',
                 'assigned_to': user_objects['oreof00024@gmail.com'],
@@ -120,23 +125,68 @@ class Command(BaseCommand):
             {
                 'title': 'Design Task View Page (Frontend)',
                 'description': 'Create a styled, responsive UI for task display for users.',
-                'assigned_to': user_objects['yoused@example.com'],
+                'assigned_to': user_objects['youssifmostafa192@gmail.com'],
             },
             {
-                'title': 'Dark Theme Integration',
-                'description': 'Apply black & orange dark theme across all frontend components.',
-                'assigned_to': user_objects['yoused@example.com'],
+            'title': 'Design Dashboard Layout',
+            'description': 'Create a responsive and user-friendly layout for the admin and user dashboards.',
+            'assigned_to': user_objects['youssifmostafa192@gmail.com'],
+            },
+            {
+                'title': 'Implement Authentication UI',
+                'description': 'Develop the frontend pages for login, registration, and password reset with proper validations.',
+                'assigned_to': user_objects['youssifmostafa192@gmail.com'],
+            },
+            {
+                'title': 'Build Static Task Display Pages',
+                'description': 'Create static pages to display task data, placeholders for dynamic content.',
+                'assigned_to': user_objects['youssifmostafa192@gmail.com'],
+            },
+            {
+                'title': 'Add Styling and Hover Effects',
+                'description': 'Apply consistent dark theme styling and add hover animations to enhance user experience.',
+                'assigned_to': user_objects['youssifmostafa192@gmail.com'],
             },
 
             # Mustafa's tasks
             {
-                'title': 'Set Up CI/CD Pipeline',
-                'description': 'Create GitHub Actions to auto deploy backend on commit.',
+            'title': 'Infrastructure Provisioning',
+            'description': 'Provision cloud resources using IaC tools like Terraform.',
+            'assigned_to': user_objects['mustafa09402@gmail.com'],
+            },
+            {
+                'title': 'CI/CD Pipeline Setup',
+                'description': 'Build automated pipelines for testing, building, and deployment.',
                 'assigned_to': user_objects['mustafa09402@gmail.com'],
             },
             {
-                'title': 'Dockerize Django Project',
-                'description': 'Build and maintain Docker containers for dev and prod environments.',
+                'title': 'Configuration Management with Ansible',
+                'description': 'Automate server configuration, software installation, and environment setup using Ansible playbooks and roles.',
+                'assigned_to': user_objects['mustafa09402@gmail.com'],
+            },
+            {
+                'title': 'Backup and Recovery',
+                'description': 'Implement automated backups and disaster recovery plans.',
+                'assigned_to': user_objects['mustafa09402@gmail.com'],
+            },
+            {
+                'title': 'Security and Access Management',
+                'description': 'Manage IAM roles and secure cloud access.',
+                'assigned_to': user_objects['mustafa09402@gmail.com'],
+            },
+            {
+                'title': 'Monitoring and Logging',
+                'description': 'Set up tools for system monitoring and centralized logging.',
+                'assigned_to': user_objects['mustafa09402@gmail.com'],
+            },
+            {
+                'title': 'Kubernetes Deployment',
+                'description': 'Deploy and manage apps on Kubernetes clusters.',
+                'assigned_to': user_objects['mustafa09402@gmail.com'],
+            },
+            {
+                'title': 'Dockerization',
+                'description': 'Containerize apps using Docker and manage them with Docker Compose.',
                 'assigned_to': user_objects['mustafa09402@gmail.com'],
             },
         ]
