@@ -5,7 +5,7 @@ resource "aws_lb" "app_alb" {
   security_groups    = [aws_security_group.alb_sg.id]
   subnets = [
     aws_subnet.public_subnet_a.id,
-    # aws_subnet.public_subnet_b.id
+    aws_subnet.public_subnet_b.id
   ]
 
   tags = {
