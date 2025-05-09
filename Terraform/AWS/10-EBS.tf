@@ -10,9 +10,9 @@ resource "aws_ebs_volume" "mysql_volume_az1" {
     Name = "mysql-db-volume-az1"
   }
 
-  lifecycle {
-    prevent_destroy = true # Prevent accidental deletion
-  }
+  # lifecycle {
+  #   prevent_destroy = true # Prevent accidental deletion
+  # }
 }
 
 # Attach EBS volume to the private database instance
