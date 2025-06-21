@@ -1,40 +1,148 @@
-{% load static %} 
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us</title>
-    <link rel="stylesheet" href="{% static 'css/about.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'imgs/fav.png' %}">
-
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 </head>
-<body>
-    <div class="container">
-        <!-- قسم الصورة -->
-        <div class="image-section">
-            <img src="{% static 'imgs/image_about/9784103.jpg' %}" alt="About Illustration">
-        </div>
 
-        <!-- قسم النص -->
-        <div class="about-container">
-            <h2>About Us</h2>
-            <p>Welcome to Task Manager, your ultimate solution for efficient task management. Our platform helps teams and individuals organize, track, and complete their tasks seamlessly.</p>
-            
-            <h3>Our Mission</h3>
-            <p>Our mission is to simplify work management and improve productivity by providing an intuitive and powerful task management system.</p>
-            
-            <h3>Why Choose Us?</h3>
-            <ul>
-                <li>Easy-to-use task organization</li>
-                <li>AI-powered task distribution</li>
-                <li>Secure and reliable platform</li>
-                <li>Real-time collaboration</li>
-            </ul>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-gray-800"
+    style='font-family: Inter, "Noto Sans", sans-serif;'>
 
-            <a href="{% url 'core:index' %}" class="btn">Back to Home</a>
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900">Task Manager</h1>
+            <a href="{% url 'core:index' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Back to
+                Home</a>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="wow-animation-left">
+                    <h2 class="text-base font-semibold text-indigo-600 tracking-wide uppercase">About & Mission</h2>
+                    <p class="mt-2 text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+                        Reimagining Task Management
+                    </p>
+                    <p class="mt-6 text-xl text-gray-600">
+                        Welcome to Task Manager. We believe that great tools are the foundation of great work. Our
+                        platform is meticulously designed to help teams and individuals bring clarity, focus, and
+                        efficiency to their projects.
+                    </p>
+                    <p class="mt-4 text-xl text-gray-600">
+                        Our mission is to build a future where work is less about managing chaos and more about making a
+                        meaningful impact. We're committed to creating a task management system that is not only
+                        powerful but also a joy to use.
+                    </p>
+                </div>
+                <div class="hidden md:block wow-animation-right">
+                    <img src="{% static 'imgs/image_about/9784103.jpg' %}" alt="Team working"
+                        class="rounded-2xl shadow-2xl">
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features Section -->
+        <section class="bg-white py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Key Features</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">TaskMaster offers a range of features to
+                        help you manage your tasks effectively.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div
+                        class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="h-40 bg-cover bg-center"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAzi9pg-H6LiBRk7eOo9ytK-ENA8x_nDdpbAVR09w2M2-4gvZ1QfekPl9awhWy60Q69Yjw2eaVoxMQalFBO5i92hF0hDsTIYVodsK1q7CZcWGLk31k6Wzzee7qFrd3RHrs10xUBdk5tBo_DO_1CrSondgui7pSDezmQgvwytVcBOpwSsXfwEmF6dqBpjfK7Cer8PvUcO5KO1VEEyD0KbL6msDj7JR-d6LFPQhnvseGzaiA2sD7cMgIeWcD9PlQ6ugR_4O-btzjUYIk");'>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-lg font-bold">Auto Task Assignment</p>
+                            <p class="mt-2 text-gray-600 text-sm">Automatically assign tasks to team members based on
+                                availability and skills.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="h-40 bg-cover bg-center"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDLa1B7ODVPw2_bjTT5XS8IoJub9JN2ReKYU0t3KTaNM80BoQQxV6A5h0CuqET_7sqq3k0PBmvGvIA_mSDL-pJR3gbWbCtffjFJoM4o5CCtx6DIc31SKDgSjTOVBMInWEpz54lX81awDG7KgT7YCv9ysNAa_j9C1CUD-g-01iQYAXm17JaAsQY_-BUjYrwTrJa0du4oyDKgb_Kwb775sFCNVDq6qwuO3kaBLTxb8sFs6cGnRUbJ3-tpyKAk_VUPchU3tSJiGjPcYJo");'>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-lg font-bold">Real-Time Progress Tracking</p>
+                            <p class="mt-2 text-gray-600 text-sm">Monitor task progress in real-time and stay updated on
+                                deadlines.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="h-40 bg-cover bg-center"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDz_3A_TsgQWpT2-46TigjrrDAsUwSN950W5NgjQnQt4jkvQ9dWki4V0qneKjyllmee6ZA9FHeGSS2JMWBEPjgKJmu5UOZ2WKKYscFV-7QJyJeax_C5cd4QqDwNNS636lqUPQUClL4gS4aok79PJoKbmhycFw064tYWIyJZoHVm8yx5O7q_SGv1F8jDzPrnQ6Z17F6Z76Ihw08NZFnjnHcyaAnZPti1b6URbbXgX0CfXnccujqKNaBvCs_qC9ovI5_qauhgMdh5Uvo");'>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-lg font-bold">Smart Workload Balancing</p>
+                            <p class="mt-2 text-gray-600 text-sm">Balance workloads across your team to prevent burnout
+                                and maximize productivity.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                        <div class="h-40 bg-cover bg-center"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBGz5v9k1Fb2gBjWsNjCVlFAZOjQpvVxLl4gyTu1HU7Jbkfo3q6qil-7UXd345bL7ezzXdfVAv90l6eunSwGQOb6eI2UP1vqQ-PUaEQQRFhVvzCg3oX8zPtX4eeqNeoFy4ciLB2dGbCcRMURoBarxw6IRax0C99WRkydk1CRaIqpND4KyVeO2M-1BbKkK19P8h5lkL-7X5EiVvruYau6JzNUXdDNREbHZxcOqinxgdUlywbfnmSC9i4lG5Z9jnKEzkaLv2TJlutrfU");'>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-lg font-bold">Visual Reports & Analytics</p>
+                            <p class="mt-2 text-gray-600 text-sm">Gain insights into team performance with visual
+                                reports and analytics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us Section -->
+        <section class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Why Choose Us?</h2>
+                </div>
+                <div class="mt-16 grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <div
+                        class="bg-white p-8 rounded-2xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <h3 class="text-xl font-bold text-gray-900">Intuitive Design</h3>
+                        <p class="mt-4 text-gray-600">Easy-to-use task organization.</p>
+                    </div>
+                    <div
+                        class="bg-white p-8 rounded-2xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <h3 class="text-xl font-bold text-gray-900">Montring</h3>
+                        <p class="mt-4 text-gray-600">Email of all updates.</p>
+                    </div>
+                    <div
+                        class="bg-white p-8 rounded-2xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <h3 class="text-xl font-bold text-gray-900">Secure & Reliable</h3>
+                        <p class="mt-4 text-gray-600">A secure and reliable platform.</p>
+                    </div>
+                    <div
+                        class="bg-white p-8 rounded-2xl shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+                        <h3 class="text-xl font-bold text-gray-900">Real-Time Collab</h3>
+                        <p class="mt-4 text-gray-600">Real-time collaboration features.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
 </body>
+
 </html>

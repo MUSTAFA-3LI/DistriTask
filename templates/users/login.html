@@ -1,88 +1,137 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
-    <link rel="stylesheet" href="{% static 'css/loginstyle.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'imgs/fav.png' %}">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" />
+    <style>
+        .left-bg {
+            background-image: url("{% static 'imgs/image_login/9784103.jpg' %}");
+        }
+    </style>
 </head>
-<body>
 
-<!-- System Messages -->
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}">
-            {{ message }}
-            <button type="button" onclick="this.parentElement.style.display='none';">&times;</button>
+<body style='font-family: Inter, "Noto Sans", sans-serif;'>
+
+    <!-- System Messages -->
+    {% if messages %}
+    <div class="fixed top-5 right-5 z-50">
+        {% for message in messages %}
+        <div class="alert-message {% if message.tags == 'error' %} bg-red-100 border-red-400 text-red-700 {% else %} bg-green-100 border-green-400 text-green-700 {% endif %} border-l-4 p-4 mb-4 shadow-lg rounded-md"
+            role="alert">
+            <p class="font-bold">{% if message.tags == 'error' %}Error{% else %}Success{% endif %}</p>
+            <p>{{ message }}</p>
         </div>
-    {% endfor %}
-</div>
-{% endif %}
-    
-    <div class="container">
-        <!-- Image Section -->
-        <div class="image-section">
-            <img src="{% static 'imgs/image_login/9784103.jpg' %}" alt="Login Illustration">
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="flex min-h-screen">
+        <!-- Left Panel -->
+        <div class="hidden lg:flex flex-col justify-end p-12 flex-1 bg-cover bg-center left-bg relative">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div class="relative z-10">
+                <h1 class="text-5xl font-bold text-white">Task Manager</h1>
+                <p class="mt-4 text-lg text-gray-200">Organize Your Life, One Task at a Time.</p>
+            </div>
         </div>
 
-        <!-- Login Section -->
-        <div class="login-container">
-            <h2>Login</h2>
-            <p class="signup-text">
-                Don't have an account yet? <a href="{% url 'users:register' %}">Sign up</a>
-            </p>
-
-            <form method="POST">
-                {% csrf_token %}
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="you@example.com">
-
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-
-                <button type="submit">LOGIN</button>
-            </form>
-
-            <p class="signup-text">
-                Don't remember password? <a href="{% url 'users:send_otp' %}">reset password</a>
-            </p>
-
-            <div class="social-login">
-                <div class="divider">
-                    <span>Or login with</span>
+        <!-- Right Panel (Form) -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center p-6 bg-white">
+            <div class="max-w-md w-full">
+                <div class="text-center lg:text-left">
+                    <h2 class="text-4xl font-bold mb-2">Login</h2>
+                    <p class="text-gray-500 mb-8">
+                        Don't have an account? <a href="{% url 'users:register' %}"
+                            class="font-semibold text-indigo-600 hover:underline">Sign up</a>
+                    </p>
                 </div>
-                <!-- Google Button -->
-                <button class="google-btn" onclick="window.location.href='https://www.google.com';">
-                    <img src="{% static 'imgs/image_login/7123025_logo_google_g_icon.png' %}" alt="Google Logo"> Google
-                </button>
 
-                <!-- Facebook Button -->
-                <button class="facebook-btn" onclick="window.location.href='https://www.facebook.com';">
-                    <img src="{% static 'imgs/image_login/download.png' %}" alt="Facebook Logo"> Facebook
-                </button>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <a href="{% url 'users:send_otp' %}"
+                                class="text-sm font-medium text-indigo-600 hover:underline">Forgot password?</a>
+                        </div>
+                        <input type="password" id="password" name="password" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        LOGIN
+                    </button>
+                </form>
+
+                <div class="my-6 flex items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="px-4 text-gray-500">Or continue with</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button onclick="window.location.href='https://www.google.com';"
+                        class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <img src="{% static 'imgs/image_login/7123025_logo_google_g_icon.png' %}" alt="Google Logo"
+                            class="h-5 w-5 mr-2">
+                        Google
+                    </button>
+                    <button onclick="window.location.href='https://www.facebook.com';"
+                        class="flex-1 flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <img src="{% static 'imgs/image_login/download.png' %}" alt="Facebook Logo"
+                            class="h-5 w-5 mr-2">
+                        Facebook
+                    </button>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <a href="{% url 'core:index' %}"
+                        class="group inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        <span>Back to Home</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
     <script>
-        // Function to hide messages after 10 seconds
+        // Function to hide messages after 5 seconds
         function hideMessages() {
-            const messages = document.querySelectorAll('.alert');
+            const messages = document.querySelectorAll('.alert-message');
             messages.forEach(message => {
                 setTimeout(() => {
+                    message.style.transition = 'opacity 1s ease-out';
                     message.style.opacity = '0';
                     setTimeout(() => {
                         message.style.display = 'none';
                     }, 1000); // Fade out duration
-                }, 5000); // 10 seconds delay
+                }, 5000); // 5 seconds delay
             });
         }
-    
+
         // Run the function when the page loads
         window.onload = hideMessages;
     </script>
 </body>
-</html>
 
+</html>

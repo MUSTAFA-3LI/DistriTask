@@ -10,9 +10,11 @@ body {
     color: #222;
     font-family: Arial, sans-serif;
 }
+
 ul {
     list-style: none;
 }
+
 a {
     color: #222;
     text-decoration: none;
@@ -107,7 +109,7 @@ header .links .btn-outside:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .main .content {
@@ -124,7 +126,7 @@ header .links .btn-outside:hover {
     font-size: 50px;
     color: white;
     z-index: 999;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .main .content h4 {
