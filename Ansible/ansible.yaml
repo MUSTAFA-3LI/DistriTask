@@ -49,11 +49,33 @@
         state: started
         enabled: true
 
+    - name: Reset SSH connection to apply group membership
+      ansible.builtin.meta: reset_connection
+
+    - name: Verify user is in docker group
+      ansible.builtin.command: groups {{ ansible_user }}
+      register: user_groups
+      become: false
+
+    - name: Display user groups
+      ansible.builtin.debug:
+        msg: "User {{ ansible_user }} is in groups: {{ user_groups.stdout }}"
+
     - name: Install Docker Compose
       ansible.builtin.apt:
         name: docker-compose-plugin
         state: present
         update_cache: true
+
+    - name: Test Docker without sudo
+      ansible.builtin.command: docker --version
+      register: docker_test
+      become: false
+      failed_when: false
+
+    - name: Display Docker test result
+      ansible.builtin.debug:
+        msg: "Docker test result: {{ docker_test.stdout if docker_test.rc == 0 else 'Failed: ' + docker_test.stderr }}"
 
     - name: Create application directory
       ansible.builtin.file:
@@ -91,11 +113,28 @@
         force: true
       when: "'private' in group_names"
 
+    - name: Create secure .env file
+      ansible.builtin.copy:
+        content: |
+          DB_HOST={{ vault_db_host }}
+          DB_PORT={{ vault_db_port }}
+          MYSQL_DATABASE={{ vault_mysql_database }}
+          MYSQL_USER={{ vault_mysql_user }}
+          MYSQL_PASSWORD={{ vault_mysql_password }}
+          MYSQL_ROOT_PASSWORD={{ vault_mysql_root_password }}
+        dest: /home/{{ ansible_user }}/DistriTask/.env
+        mode: '0600'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
 
-    # - name: Run Docker container
-    #   community.general.docker_container:
-    #     name: DistriTask_container
-    #     image: mustafa3li/distritask:latest
-    #     state: started
-    #     ports:
-    #       - "8000:8000"
+
+    - name: Run docker compose up with build
+      ansible.builtin.shell: docker compose up -d --build
+      args:
+        chdir: /home/{{ ansible_user }}/DistriTask
+      become: false
+      register: compose_result
+
+    - name: Display docker compose result
+      ansible.builtin.debug:
+        msg: "Docker Compose result: {{ compose_result.stdout }}"

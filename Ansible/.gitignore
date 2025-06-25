@@ -1,1 +1,6 @@
 *.pem
+*.retry
+.vault_pass
+group_vars/*/vault.yaml
+host_vars/*/vault.yaml
+*.log

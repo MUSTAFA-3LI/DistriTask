@@ -3,10 +3,10 @@ output "public_instance_1_az1" {
   description = "Public IP of the first EC2 instance in the public subnet (AZ1)"
 }
 
-output "public_instance_2_az1" {
-  value       = aws_instance.public_instance_2_az1.public_ip
-  description = "Public IP of the second EC2 instance in the public subnet (AZ1)"
-}
+# output "public_instance_2_az1" {
+#   value       = aws_instance.public_instance_2_az1.public_ip
+#   description = "Public IP of the second EC2 instance in the public subnet (AZ1)"
+# }
 
 # output "public_instance_3_az1" {
 #   value       = aws_instance.public_instance_3_az1.public_ip
@@ -29,6 +29,6 @@ output "private_instance_1_az1" {
 # }
 
 
-output "alb_dns_name" {
-  value = aws_lb.app_alb.dns_name
-}
+# output "alb_dns_name" {
+#   value = aws_lb.app_alb.dns_name
+# }

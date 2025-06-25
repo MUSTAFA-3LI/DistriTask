@@ -45,19 +45,19 @@ resource "aws_instance" "public_instance_1_az1" {
   associate_public_ip_address = true
 }
 
-resource "aws_instance" "public_instance_2_az1" {
-  ami                    = "ami-04a81a99f5ec58529"
-  instance_type          = "t3.medium"
-  key_name               = aws_key_pair.SSH_key.key_name
-  subnet_id              = aws_subnet.public_subnet_a.id
-  vpc_security_group_ids = [aws_security_group.public_sg.id]
+# resource "aws_instance" "public_instance_2_az1" {
+#   ami                    = "ami-04a81a99f5ec58529"
+#   instance_type          = "t3.medium"
+#   key_name               = aws_key_pair.SSH_key.key_name
+#   subnet_id              = aws_subnet.public_subnet_a.id
+#   vpc_security_group_ids = [aws_security_group.public_sg.id]
 
-  tags = {
-    Name = "public_instance_2_az1"
-  }
+#   tags = {
+#     Name = "public_instance_2_az1"
+#   }
 
-  associate_public_ip_address = true
-}
+#   associate_public_ip_address = true
+# }
 
 # resource "aws_instance" "public_instance_3_az1" {
 #   ami                    = "ami-04a81a99f5ec58529"
