@@ -2,13 +2,13 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: django-ingress
-  namespace: taskmanager-ns
+  namespace: distritask-ns
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: taskmanager.example.com        ## http://taskmanager.example.com:30000/
-    http:                                ## http://taskmanager.example.com/
+  - host: distritask.example.com        ## http://distritask.example.com:30000/
+    http:                                ## http://distritask.example.com/
       paths:
       - path: /
         pathType: Prefix

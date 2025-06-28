@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  namespace: taskmanager-ns
+  namespace: distritask-ns
 spec:
   replicas: 1
   selector:
