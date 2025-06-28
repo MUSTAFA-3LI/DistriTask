@@ -61,8 +61,6 @@
 #   port             = 8000
 # }
 
-##################################################################################
-
 # resource "aws_lb_target_group_attachment" "ec2_attachment_3" {
 #   target_group_arn = aws_lb_target_group.app_tg.arn
 #   target_id        = aws_instance.public_instance_3_az1.id

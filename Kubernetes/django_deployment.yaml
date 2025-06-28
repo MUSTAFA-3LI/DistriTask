@@ -18,25 +18,31 @@ spec:
         image: mustafa3li/distritask:latest
         imagePullPolicy: Always
         env:
-        - name: DATABASE_HOST
-          value: mysql.taskmanager.svc.cluster.local
-        - name: DATABASE_PORT
-          value: "3306"
-        - name: DATABASE_NAME
+        - name: DB_HOST
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: database-name
-        - name: DATABASE_USER
+              key: db-host
+        - name: DB_PORT
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: user
-        - name: DATABASE_PASSWORD
+              key: db-port
+        - name: MYSQL_DATABASE
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: password
+              key: mysql-database
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: mysql-password
         resources:
           limits:
             memory: "512Mi"

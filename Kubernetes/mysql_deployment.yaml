@@ -21,22 +21,22 @@ spec:
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: root-password
+              key: mysql-root-password
         - name: MYSQL_DATABASE
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: database-name
+              key: mysql-database
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: user
+              key: mysql-user
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
               name: db-secrets
-              key: password
+              key: mysql-password
         resources:
           limits:
             memory: "512Mi"
