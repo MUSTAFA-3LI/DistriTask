@@ -1,0 +1,552 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Chat - Task Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --light-bg: #f5f7fa;
+            --border-color: #e3eafc;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        body {
+            font-family: 'Arial', 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--light-bg) 0%, #c3cfe2 100%);
+            position: relative;
+        }
+        
+        .bg-shape {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.22;
+            filter: blur(2.5px) brightness(1.1);
+            animation: floatBg 8s ease-in-out infinite alternate;
+            border-radius: 50%;
+        }
+        
+        .bg-shape1 {
+            top: -120px; left: -120px;
+            width: 420px; height: 420px;
+            background: radial-gradient(circle at 60% 40%, #a5c8f7 0%, #e0eafc 80%);
+            box-shadow: 0 0 80px 30px #a5c8f755, 0 0 120px 60px #e0eafc33;
+            animation-delay: 0s;
+        }
+        
+        .bg-shape2 {
+            bottom: -100px; right: -100px;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle at 40% 60%, #b7e0c7 0%, #cfdef3 80%);
+            box-shadow: 0 0 80px 30px #b7e0c755, 0 0 120px 60px #cfdef333;
+            animation-delay: 2s;
+        }
+        
+        .bg-shape3 {
+            top: 40%; left: 50%;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle at 50% 50%, #f7cac9 0%, #e0eafc 80%);
+            box-shadow: 0 0 60px 20px #f7cac955;
+            transform: translate(-50%, -50%);
+            animation-delay: 4s;
+        }
+        
+        @keyframes floatBg {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(30px) scale(1.04); }
+        }
+        
+        .chat-layout {
+            display: flex;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 18px 24px;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, #f8f9fa 60%, #fff 100%);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        
+        .online-dot {
+            width: 10px; 
+            height: 10px; 
+            background: var(--success-color); 
+            border-radius: 50%; 
+            margin-left: 8px; 
+            box-shadow: 0 0 0 2px var(--border-color); 
+            display: inline-block;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: linear-gradient(135deg, var(--light-bg) 0%, var(--border-color) 100%);
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--border-color);
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+            box-shadow: 0 2px 10px rgba(52,152,219,0.08);
+            position: relative;
+            transition: all 0.3s ease;
+            word-break: break-word;
+            animation: fadeInMsg 0.4s;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-color) 80%, var(--primary-dark) 100%);
+            color: var(--text-light);
+            border: none;
+            box-shadow: 0 4px 15px rgba(52,152,219,0.13);
+            border-radius: 12px 12px 4px 12px;
+        }
+        
+        .message.other {
+            align-self: flex-start;
+            background: #f8f9fa;
+            color: var(--text-dark);
+            border-radius: 12px 12px 12px 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .message .timestamp {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 4px;
+            text-align: right;
+        }
+        
+        .message.other .timestamp {
+            color: #888;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: 16px 20px;
+            border-top: 2px solid var(--border-color);
+            gap: 12px;
+            background: #f8f9fa;
+            box-shadow: 0 -2px 8px rgba(52,152,219,0.04);
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 18px;
+            border: 1.5px solid #e9ecef;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(52,152,219,0.03);
+            background: #fff;
+            transition: all 0.3s ease;
+            resize: none;
+            min-height: 20px;
+            max-height: 120px;
+            line-height: 1.5;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            border: none;
+            border-radius: 18px;
+            padding: 0 24px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(52,152,219,0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(52,152,219,0.2);
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 20px 0 0;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            border-radius: 18px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            box-shadow: 0 2px 10px rgba(52,152,219,0.13);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary-dark);
+            transform: translateX(2px) scale(1.04);
+            box-shadow: 0 6px 18px rgba(52,152,219,0.2);
+        }
+        
+        .typing-indicator {
+            font-size: 0.95rem;
+            color: #888;
+            margin: 4px 0 0 16px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-height: 16px;
+        }
+        
+        .typing-dot {
+            width: 6px; 
+            height: 6px; 
+            background: var(--primary-color); 
+            border-radius: 50%; 
+            display: inline-block; 
+            animation: blink 1s infinite alternate; 
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes blink { 
+            from { opacity: 0.3; } 
+            to { opacity: 1; } 
+        }
+        
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: none; }
+        }
+        
+        @media (max-width: 900px) {
+            .chat-layout { 
+                flex-direction: column; 
+                height: auto;
+            }
+            
+            .chat-container {
+                height: calc(100vh - 180px);
+            }
+            
+            .back-btn {
+                margin: 16px 16px 0 0;
+                padding: 8px 16px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .chat-input-area {
+                padding: 12px 16px;
+            }
+            
+            .chat-input {
+                padding: 10px 16px;
+            }
+            
+            .send-btn {
+                padding: 0 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        window.userEmail = "{{ request.user.email|escapejs }}";
+        window.managerEmail = "{{ manager_email|escapejs }}";
+        window.roomName = "{{ room_name|escapejs }}";
+        window.error = "{{ error|escapejs }}";
+    </script>
+
+    <div class="bg-shape bg-shape1"></div>
+    <div class="bg-shape bg-shape2"></div>
+    <div class="bg-shape bg-shape3"></div>
+
+    <a href="{% url 'tasks:employee_tasks' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Tasks
+    </a>
+    
+    <div class="chat-layout">
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i> 
+                Chat with: <span id="current-employee">Project Manager</span>
+                <span class="online-dot"></span>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be rendered here by JavaScript -->
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator" style="display:none;">
+                <span id="typing-text">typing...</span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+            
+            <form class="chat-input-area" autocomplete="off" id="chat-form">
+                <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1"></textarea>
+                <button class="send-btn" type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const chatInput = document.getElementById('chat-input');
+            const chatForm = document.getElementById('chat-form');
+            const chatBox = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const typingText = document.getElementById('typing-text');
+            const currentEmployeeSpan = document.getElementById('current-employee');
+
+            // Check if elements exist
+            if (!chatInput || !chatForm || !chatBox || !typingIndicator || !typingText || !currentEmployeeSpan) {
+                console.error('One or more DOM elements are missing:', {
+                    chatInput, chatForm, chatBox, typingIndicator, typingText, currentEmployeeSpan
+                });
+                return;
+            }
+
+            // Debug variables
+            console.log('userEmail:', window.userEmail);
+            console.log('managerEmail:', window.managerEmail);
+            console.log('roomName:', window.roomName);
+            console.log('error:', window.error);
+
+            // Clean room name for WebSocket compatibility
+            function cleanRoomName(email1, email2) {
+                return [email1, email2].sort().join('__');
+            }
+
+            // Check if there is an error from the view
+            if (window.error) {
+                console.error('Chat error:', window.error);
+                chatBox.innerHTML = `<p>${window.error}</p>`;
+                return;
+            }
+
+            // Check if roomName is valid
+            const [email1, email2] = window.roomName.split('__');
+            const cleanRoomNameValue = cleanRoomName(email1, email2);
+
+            if (!window.roomName || !window.userEmail || !window.managerEmail) {
+                console.error('Invalid chat configuration:', {
+                    userEmail: window.userEmail,
+                    managerEmail: window.managerEmail,
+                    roomName: window.roomName
+                });
+                chatBox.innerHTML = '<p>Error: Invalid chat room configuration. Please contact support.</p>';
+                return;
+            }
+
+            // WebSocket setup
+            const chatSocket = new WebSocket(
+                'ws://' + window.location.host + '/ws/chat/' + encodeURIComponent(cleanRoomNameValue) + '/'
+            );
+
+            chatSocket.onopen = function(e) {
+                console.log('WebSocket connection opened for room:', cleanRoomNameValue);
+            };
+
+            // Load previous messages
+            function loadMessages() {
+                fetch('/chat/messages/?room=' + encodeURIComponent(cleanRoomNameValue))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Messages loaded:', data);
+                        chatBox.innerHTML = '';
+                        if (data.error) {
+                            chatBox.innerHTML = `<p>Error: ${data.error}</p>`;
+                            return;
+                        }
+                        data.forEach(msg => {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `message ${msg.sender === window.userEmail ? 'user' : 'other'}`;
+                            const senderName = msg.sender === window.userEmail ? 'You' : 'Project Manager';
+                            messageDiv.innerHTML = `
+                                <strong>${senderName}:</strong> ${msg.message}
+                                <span class="timestamp">${msg.timestamp}</span>
+                                ${msg.is_read ? '<span class="read-status">✔</span>' : ''}
+                            `;
+                            chatBox.appendChild(messageDiv);
+                        });
+                        scrollToBottom();
+                    })
+                    .catch(error => {
+                        console.error('Error loading messages:', error);
+                        chatBox.innerHTML = '<p>Error loading messages. Please try again.</p>';
+                    });
+            }
+
+            // Scroll to bottom of chat
+            function scrollToBottom() {
+                setTimeout(() => {
+                    chatBox.scrollTo({
+                        top: chatBox.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 50);
+            }
+
+            // WebSocket event handlers
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log('WebSocket message received:', data);
+                if (data.error) {
+                    console.error('WebSocket error message:', data.error);
+                    chatBox.innerHTML = `<p>Error: ${data.error}</p>`;
+                    return;
+                }
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${data.sender === window.userEmail ? 'user' : 'other'}`;
+                const senderName = data.sender === window.userEmail ? 'You' : 'Project Manager';
+                messageDiv.innerHTML = `
+                    <strong>${senderName}:</strong> ${data.message}
+                    <span class="timestamp">${data.timestamp}</span>
+                    ${data.is_read ? '<span class="read-status">✔</span>' : ''}
+                `;
+                chatBox.appendChild(messageDiv);
+                scrollToBottom();
+            };
+
+            chatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly:', e);
+                chatBox.innerHTML += '<p>Connection lost. Please refresh the page.</p>';
+                scrollToBottom();
+            };
+
+            chatSocket.onerror = function(e) {
+                console.error('WebSocket error:', e);
+            };
+
+            // Handle form submission
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const messageText = chatInput.value.trim();
+                if (!messageText || !chatSocket) {
+                    console.warn('Cannot send message: missing message or socket', {
+                        messageText, chatSocket
+                    });
+                    return;
+                }
+
+                // Send message via WebSocket
+                chatSocket.send(JSON.stringify({
+                    'message': messageText,
+                    'sender': window.userEmail,
+                    'receiver': window.managerEmail
+                }));
+
+                // Clear input
+                chatInput.value = '';
+                chatInput.style.height = 'auto';
+                chatInput.focus();
+            });
+
+            // Auto-resize textarea and handle Enter key
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Initialize
+            loadMessages();
+            chatInput.focus();
+        });
+    </script>
+</body>
+</html>

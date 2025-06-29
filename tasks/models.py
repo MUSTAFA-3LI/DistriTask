@@ -20,7 +20,7 @@ class Task(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'employee'})  
+    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'employee'},related_name='assigned_tasks')  
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')  
     created_at = models.DateTimeField(auto_now_add=True) #auto set local time

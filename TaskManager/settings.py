@@ -36,6 +36,9 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'chat',
+    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +48,10 @@ INSTALLED_APPS = [
     'core',
     'users',
     'tasks',
+    'chatbot',
+    'rest_framework',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -56,6 +63,24 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+#     #this for global authentication if need auth for specific end point write in view
+#     #for basic auth
+#    'DEFAULT_AUTHENTICATION_CLASSES': (
+#     'rest_framework.authentication.BasicAuthentication', #require username and password
+# ),
+#     #for token auth
+#    'DEFAULT_AUTHENTICATION_CLASSES': (
+#     'rest_framework.authentication.TokenAuthentication',
+# ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#     'rest_framework.permissions.IsAuthenticated',       #any one with user and password have full access
+# ),
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+#     'PAGE_SIZE': 10
+}
+
 
 ROOT_URLCONF = 'TaskManager.urls'
 
@@ -76,6 +101,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'TaskManager.wsgi.application'
+# Channels
+
+
+ASGI_APPLICATION = 'TaskManager.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+
+
 
 
 # Database
@@ -214,3 +252,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ahmed.h.ramadan.cs@gmail.com'
 EMAIL_HOST_PASSWORD = 'ymkywffxlhtvvqop'  # بدون مسافات
+LOGIN_URL = '/users/login/'
+AUTH_USER_MODEL = 'users.User'
+

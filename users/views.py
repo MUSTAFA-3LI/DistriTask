@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages  # For system messages
-
+from django.contrib.auth import authenticate, login as auth_login
 from django.core.mail import send_mail #sent mail with otp
 from django.utils import timezone
 import random
@@ -11,10 +11,8 @@ from django.contrib.auth.hashers import check_password, make_password  # For pas
 import time 
 
 
-def login(request):
+def login(request) :
 
-
-    
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -22,24 +20,27 @@ def login(request):
         try:
             user = User.objects.get(email=email)
 
-            # Use Django's check_password for secure password checking
-            if check_password(password, user.password):  
+            if check_password(password, user.password):
+                auth_login(request, user)  # ← تسجيل الدخول الرسمي هنا 👌
+
+                # تقدر تسيب الحاجات دي لو بتستخدمها في الجلسة
                 request.session['user_id'] = user.id  
                 request.session['user_role'] = user.role  
-                request.session['user_name'] = f"{user.first_name} {user.last_name}"  # Store full name in session
+                request.session['user_name'] = f"{user.first_name} {user.last_name}"
 
-                messages.success(request, "Login successful!")  # Success message
+                messages.success(request, "Login successful!")
 
                 if user.role == 'manager':
                     return redirect('tasks:manager_tasks')
                 elif user.role == 'employee':
                     return redirect('tasks:employee_tasks')
             else:
-                messages.error(request, 'Invalid password')  
+                messages.error(request, 'Invalid password')
         except User.DoesNotExist:
-            messages.error(request, 'User not found')  
+            messages.error(request, 'User not found')
 
-        return render(request, 'users/login.html')  # Reload the login page with error messages
+        return render(request, 'users/login.html')
+    
     return render(request, 'users/login.html')
 
 

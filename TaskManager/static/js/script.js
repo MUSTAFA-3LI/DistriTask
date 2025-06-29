@@ -35,10 +35,28 @@ function filterTasks(status) {
     });
 }
 
+// Store interval IDs for each task
+const countdownIntervals = {};
+
 // Function to calculate time remaining
 function updateCountdown(taskId, deadline) {
     const countdownElement = document.getElementById(`countdown-${taskId}`);
     if (!countdownElement) return;
+
+    // Check if task is completed
+    const taskElement = document.querySelector(`[data-status="completed"][data-task-id="${taskId}"]`);
+    if (taskElement) {
+        countdownElement.textContent = "✅ Task completed";
+        countdownElement.style.color = "#28a745";
+        countdownElement.style.fontWeight = "600";
+        
+        // Clear the interval for this task
+        if (countdownIntervals[taskId]) {
+            clearInterval(countdownIntervals[taskId]);
+            delete countdownIntervals[taskId];
+        }
+        return;
+    }
 
     const deadlineDate = parseDeadline(deadline);
     if (isNaN(deadlineDate.getTime())) {
@@ -65,11 +83,29 @@ function updateCountdown(taskId, deadline) {
 // Function to initialize countdowns
 function initializeCountdowns() {
     document.querySelectorAll('.task-card').forEach(task => {
-        const taskId = task.querySelector('span[id^="countdown-"]').id.split('-')[1];
-        const deadline = task.querySelector('span[id^="deadline-"]').textContent.trim(); // Ensure no extra spaces
+        const countdownElement = task.querySelector('span[id^="countdown-"]');
+        if (!countdownElement) return;
+        
+        const taskId = countdownElement.id.split('-')[1];
+        const deadlineElement = task.querySelector('span[id^="deadline-"]');
+        if (!deadlineElement) return;
+        
+        const deadline = deadlineElement.textContent.trim();
+        
+        // Initial update
         updateCountdown(taskId, deadline);
-        setInterval(() => updateCountdown(taskId, deadline), 1000);
+        
+        // Set interval and store the ID
+        countdownIntervals[taskId] = setInterval(() => updateCountdown(taskId, deadline), 1000);
     });
+}
+
+// Function to stop countdown for a specific task
+function stopCountdown(taskId) {
+    if (countdownIntervals[taskId]) {
+        clearInterval(countdownIntervals[taskId]);
+        delete countdownIntervals[taskId];
+    }
 }
 
 // Function to hide messages after 5 seconds
@@ -83,9 +119,6 @@ function hideMessages() {
             }, 1000); // Fade out duration
         }, 5000); // 5 seconds delay
     });
-}
-
-
-
+};
 
 ;

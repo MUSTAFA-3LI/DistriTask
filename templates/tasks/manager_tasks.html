@@ -1,4 +1,5 @@
 {% load static %}
+{% include 'partials/chatbot.html' %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -129,6 +130,11 @@
                 <li><a href="#" onclick="showTaskForm()"><i class="fas fa-plus"></i> Add Task</a></li>
             </ul>
             <div class="sidebar-buttons">
+                <!-- add button for chat -->
+                <a href="{% url 'chat:chat_page' %}" class="chat-btn">
+                    <i class="fas fa-comments"></i> Chat
+                </a>
+                
                 <a href="{% url 'users:change_password' %}" class="change-password-link">
                     <i class="fas fa-key"></i> Change Password
                 </a>
@@ -148,7 +154,7 @@
                 <div id="taskList" class="task-list">
                     {% if page_obj %}
                     {% for task in page_obj %}
-                    <div class="task-card {{ task.status }} {{ task.priority }}" data-status="{{ task.status }}">
+                    <div class="task-card {{ task.status }} {{ task.priority }}" data-status="{{ task.status }}" data-task-id="{{ task.id }}">
                         <div class="task-card-content">
                             <h3>{{ task.title }}</h3>
                             <p>{{ task.description }}</p>
@@ -206,196 +212,195 @@
                 </div>
             </div>
 
-            <!-- Employees Section -->
-            <div class="employees-section">
-                <h2>Employees Overview</h2>
-                <div class="employees-list">
-                    {% for data in employee_data %}
-                    <div class="employee-card">
-                        <h3>{{ data.first_name }} {{ data.last_name }}</h3>
-                        <p>
-                            <strong>Total Tasks:</strong>
-                            <span class="task-count total-tasks">{{ data.total_tasks }}</span>
-                        </p>
-                        <p>
-                            <strong>Delayed Tasks:</strong>
-                            <span class="task-count delayed-tasks">{{ data.delayed_tasks }}</span>
-                        </p>
-                        <p>
-                            <strong>Completed Tasks:</strong>
-                            <span class="task-count completed-tasks">{{ data.completed_tasks }}</span>
-                        </p>
-                    </div>
-                    {% empty %}
-                    <div class="employee-card">
-                        <h3>No Employees</h3>
-                        <p>There are no employees assigned to tasks yet.</p>
-                    </div>
-                    {% endfor %}
+        <!-- Employees Section -->
+        <div class="employees-section">
+            <h2>Employees Overview</h2>
+            <div class="employees-list">
+                {% for data in employee_data %}
+                <div class="employee-card">
+                    <h3>{{ data.first_name }} {{ data.last_name }}</h3>
+                    <p>
+                        <strong>Total Tasks:</strong>
+                        <span class="task-count total-tasks">{{ data.total_tasks }}</span>
+                    </p>
+                    <p>
+                        <strong>Delayed Tasks:</strong>
+                        <span class="task-count delayed-tasks">{{ data.delayed_tasks }}</span>
+                    </p>
+                    <p>
+                        <strong>Completed Tasks:</strong>
+                        <span class="task-count completed-tasks">{{ data.completed_tasks }}</span>
+                    </p>
                 </div>
+                {% empty %}
+                <div class="employee-card">
+                    <h3>No Employees</h3>
+                    <p>There are no employees assigned to tasks yet.</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
-
-
-        <script>
-            // Function to handle logout
-            function logout() {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You are about to logout!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, logout!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "{% url 'tasks:log_out' %}";
-                    }
-                });
-            }
-
-            // Function to search tasks
-            function searchTasks(searchTerm) {
-                const tasks = document.querySelectorAll('.task-card');
-                searchTerm = searchTerm.toLowerCase();
-
-                tasks.forEach(task => {
-                    const title = task.querySelector('h3').textContent.toLowerCase();
-                    const description = task.querySelector('p').textContent.toLowerCase();
-                    const assignedTo = task.querySelector('p:nth-child(3)').textContent.toLowerCase();
-                    const priority = task.querySelector('p:nth-child(4)').textContent.toLowerCase();
-                    const status = task.querySelector('p:nth-child(5)').textContent.toLowerCase();
-
-                    if (title.includes(searchTerm) ||
-                        description.includes(searchTerm) ||
-                        assignedTo.includes(searchTerm) ||
-                        priority.includes(searchTerm) ||
-                        status.includes(searchTerm)) {
-                        task.style.display = 'block';
-                    } else {
-                        task.style.display = 'none';
-                    }
-                });
-            }
-
-            // Function to show the form for adding or updating a task
-            function showTaskForm(taskId = null, title = "", description = "", priority = "low", status = "pending", deadline = "") {
-                const isUpdate = taskId !== null;
-                const formTitle = isUpdate ? "✏️ Update Task" : "➕ Add New Task";
-                const submitText = isUpdate ? "Save" : "Add";
-                const formAction = isUpdate ? `{% url 'tasks:update_task' 0 %}`.replace("0", taskId) : "{% url 'tasks:add_task' %}";
-
-                Swal.fire({
-                    title: formTitle,
-                    html: `
-                        <form id="taskForm" method="POST" action="${formAction}" class="task-form-popup">
-                            {% csrf_token %}
-                            <input type="hidden" name="task_id" value="${taskId || ''}">
-                            
-                            <div class="form-group">
-                                <label>📂 Task Category:</label>
-                                <select name="category" required class="swal2-input">
-                                    {% for category in categories %}
-                                    <option value="{{ category }}">{{ category }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>✍️ Task Name:</label>
-                                <input type="text" name="title" value="${title}" placeholder="Enter task name" required class="swal2-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label>📝 Task Description:</label>
-                                <textarea name="description" placeholder="Enter task description" class="swal2-textarea">${description}</textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label>🔥 Priority:</label>
-                                <select name="priority" class="swal2-input">
-                                    <option value="low" ${priority === 'low' ? 'selected' : ''}>🟢 Low</option>
-                                    <option value="medium" ${priority === 'medium' ? 'selected' : ''}>🟠 Medium</option>
-                                    <option value="high" ${priority === 'high' ? 'selected' : ''}>🔴 High</option>
-                                    <option value="urgent" ${priority === 'urgent' ? 'selected' : ''}>🚨 Urgent</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>⏰ Deadline:</label>
-                                <input type="datetime-local" name="deadline" value="${deadline ? parseDeadline(deadline).toISOString().slice(0, 16) : ''}" required class="swal2-input">
-                            </div>
-                        </form>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: submitText,
-                    cancelButtonText: 'Cancel',
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    showLoaderOnConfirm: true,
-                    preConfirm: () => {
-                        const form = document.getElementById('taskForm');
-                        return fetch(form.action, {
-                            method: 'POST',
-                            body: new FormData(form)
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(response.statusText);
-                                }
-                                return response;
-                            })
-                            .catch(error => {
-                                Swal.showValidationMessage(`Request failed: ${error}`);
-                            });
-                    },
-                    allowOutsideClick: () => !Swal.isLoading()
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: isUpdate ? 'Task Updated!' : 'Task Added!',
-                            text: isUpdate ? 'Your task has been updated successfully.' : 'Your task has been added successfully.',
-                            icon: 'success'
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    }
-                });
-            }
-
-            // Function to parse deadline string to Date object
-            function parseDeadline(deadline) {
-                return new Date(deadline);
-            }
-
-            // Function to confirm task deletion
-            function confirmDeleteTask(taskId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById(`deleteForm-${taskId}`).submit();
-                    }
-                });
-            }
-
-            // Initialize on page load
-            window.onload = function () {
-                initializeCountdowns();
-                hideMessages();
-            };
-        </script>
-        <script src="{% static 'js/script.js' %}"></script>
     </div>
+
+    <script>
+    // Function to handle logout
+    function logout() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to logout!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'tasks:log_out' %}";
+            }
+        });
+    }
+
+    // Function to search tasks
+    function searchTasks(searchTerm) {
+        const tasks = document.querySelectorAll('.task-card');
+        searchTerm = searchTerm.toLowerCase();
+
+        tasks.forEach(task => {
+            const title = task.querySelector('h3').textContent.toLowerCase();
+            const description = task.querySelector('p').textContent.toLowerCase();
+            const assignedTo = task.querySelector('p:nth-child(3)').textContent.toLowerCase();
+            const priority = task.querySelector('p:nth-child(4)').textContent.toLowerCase();
+            const status = task.querySelector('p:nth-child(5)').textContent.toLowerCase();
+
+            if (title.includes(searchTerm) ||
+                description.includes(searchTerm) ||
+                assignedTo.includes(searchTerm) ||
+                priority.includes(searchTerm) ||
+                status.includes(searchTerm)) {
+                task.style.display = 'block';
+            } else {
+                task.style.display = 'none';
+            }
+        });
+    }
+
+    // Function to show the form for adding or updating a task
+    function showTaskForm(taskId = null, title = "", description = "", priority = "low", status = "pending", deadline = "") {
+        const isUpdate = taskId !== null;
+        const formTitle = isUpdate ? "✏️ Update Task" : "➕ Add New Task";
+        const submitText = isUpdate ? "Save" : "Add";
+        const formAction = isUpdate ? `{% url 'tasks:update_task' 0 %}`.replace("0", taskId) : "{% url 'tasks:add_task' %}";
+
+        Swal.fire({
+            title: formTitle,
+            html: `
+                <form id="taskForm" method="POST" action="${formAction}" class="task-form-popup">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_id" value="${taskId || ''}">
+                    
+                    <div class="form-group">
+                        <label>📂 Task Category:</label>
+                        <select name="category" required class="swal2-input">
+                            {% for category in categories %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>✍️ Task Name:</label>
+                        <input type="text" name="title" value="${title}" placeholder="Enter task name" required class="swal2-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>📝 Task Description:</label>
+                        <textarea name="description" placeholder="Enter task description" class="swal2-textarea">${description}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🔥 Priority:</label>
+                        <select name="priority" class="swal2-input">
+                            <option value="low" ${priority === 'low' ? 'selected' : ''}>🟢 Low</option>
+                            <option value="medium" ${priority === 'medium' ? 'selected' : ''}>🟠 Medium</option>
+                            <option value="high" ${priority === 'high' ? 'selected' : ''}>🔴 High</option>
+                            <option value="urgent" ${priority === 'urgent' ? 'selected' : ''}>🚨 Urgent</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>⏰ Deadline:</label>
+                        <input type="datetime-local" name="deadline" value="${deadline ? parseDeadline(deadline).toISOString().slice(0, 16) : ''}" required class="swal2-input">
+                    </div>
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: submitText,
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                const form = document.getElementById('taskForm');
+                return fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response;
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: isUpdate ? 'Task Updated!' : 'Task Added!',
+                    text: isUpdate ? 'Your task has been updated successfully.' : 'Your task has been added successfully.',
+                    icon: 'success'
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        });
+    }
+
+    // Function to parse deadline string to Date object
+    function parseDeadline(deadline) {
+        return new Date(deadline);
+    }
+
+    // Function to confirm task deletion
+    function confirmDeleteTask(taskId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(`deleteForm-${taskId}`).submit();
+            }
+        });
+    }
+
+    // Initialize on page load
+    window.onload = function () {
+        initializeCountdowns();
+        hideMessages();
+    };
+    </script>
+    <script src="{% static 'js/script.js' %}"></script>
+</div>
 </body>
 
 </html>

@@ -27,101 +27,174 @@
     {% endif %}
 
     <div class="dashboard-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo-section">
-                <img src="{% static 'imgs/images_user/logo.webp' %}" alt="Task Manager Logo" class="logo">
-                <a href="{% url 'tasks:employee_tasks' %}" style="text-decoration: none; color: inherit;">
-                    Task Management
-                </a>
+        <!-- Header the same as manager -->
+        <header class="header">
+            <!-- Header Left -->
+            <div class="header-left">
+                <!-- Hamburger menu for mobile -->
+                <div class="hamburger" id="hamburger-menu" aria-label="Open sidebar" aria-controls="sidebar" aria-expanded="false" tabindex="0">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <h1 class="project-name">
+                    <a href="{% url 'tasks:employee_tasks' %}" style="text-decoration: none; color: inherit;">
+                        Task Management
+                    </a>
+                </h1>
             </div>
+
+            <!-- Search Section -->
             <div class="search-section">
-                <input type="text" placeholder="Search tasks..." class="search-input">
+                <input type="text" placeholder="Search tasks..." class="search-input" onkeyup="searchTasks(this.value)">
                 <i class="fas fa-search search-icon"></i>
             </div>
-            <div class="user-section">
-                <img src="{% static 'imgs/images_user/picture admain.webp' %}" alt="User Image" class="user-image">
-                <span class="user-name">{{ request.session.user_name }}</span>
+
+            <!-- Header Right -->
+            <div class="header-right">
+                <!-- notification list -->
+                <div class="dropdown">
+                    <button class="dropdown-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-header">
+                            <h3>Notifications</h3>
+                            <button class="mark-all-read">Mark all as read</button>
+                        </div>
+                        <div class="notification-list">
+                            <div class="notification-item unread">
+                                <i class="fas fa-tasks"></i>
+                                <div class="notification-text">
+                                    <p>New task assigned: "Update website content"</p>
+                                    <span class="notification-time">2 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div class="notification-text">
+                                    <p>Task "Client meeting" is due in 1 hour</p>
+                                    <span class="notification-time">15 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <i class="fas fa-check-circle"></i>
+                                <div class="notification-text">
+                                    <p>Task "Project review" has been completed</p>
+                                    <span class="notification-time">1 hour ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="#">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Profile Dropdown -->
+                <div class="dropdown profile-dropdown">
+                    <button class="dropdown-btn profile-btn">
+                        <img src="{% static 'imgs/images_user/picture admain.webp' %}" alt="Profile" class="profile-pic">
+                        <span class="profile-name">{{ request.session.user_name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content profile-content">
+                        <div class="profile-info">
+                            <img src="{% static 'imgs/images_user/picture admain.webp' %}" alt="Profile" class="profile-pic-large">
+                            <div class="profile-details">
+                                <h3>{{ request.session.user_name }}</h3>
+                                <p>Employee</p>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'users:change_password' %}" class="dropdown-item">
+                            <i class="fas fa-key"></i>
+                            <span>Change Password</span>
+                        </a>
+                        <a href="#" class="dropdown-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Sidebar and Main Content -->
-        <div class="content-wrapper">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <h2>📊 User Dashboard</h2>
-                <ul>
-                    <li><a href="#" onclick="filterTasks('all')"><i class="fas fa-tasks"></i> All Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('pending')"><i class="fas fa-calendar-alt"></i> Pending
-                            Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('in_progress')"><i class="fas fa-calendar-day"></i> In Progress
-                            Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed
-                            Tasks</a></li>
-                    <li><a href="#" onclick="filterTasks('delayed')"><i class="fas fa-exclamation-triangle"></i> Delayed
-                            Tasks</a></li>
-                </ul>
-
-                <!-- user change passeod -->
-                <li><a href="{% url 'users:change_password' %}" class="logout-btn">Change Password</a></li>
-
-
-                <a href="#" class="logout-btn" onclick="logout()" style="text-decoration: none;">
+        <!-- Sidebar and Main Content the same as manager -->
+        <div class="sidebar">
+            <h2> Dashboard</h2>
+            <ul>
+                <li><a href="#" onclick="filterTasks('all')"><i class="fas fa-tasks"></i> All Tasks</a></li>
+                <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed</a></li>
+                <li><a href="#" onclick="filterTasks('delayed')"><i class="fas fa-clock"></i> Delayed</a></li>
+                <li><a href="#" onclick="filterTasks('in_progress')"><i class="fas fa-cogs"></i> In Progress</a></li>
+            </ul>
+                <div class="sidebar-buttons">
+                    <!-- add button for chat -->
+                    <a href="{% url 'chat:employee_chat' %}" class="chat-btn">
+                        <i class="fas fa-comments"></i> Chat
+                    </a>
+                    <!-- add button for change password -->
+                <a href="{% url 'users:change_password' %}" class="change-password-link">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+                <a href="#" class="logout-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <h1>📌 My Tasks</h1>
-                <div class="task-list tasks-grid">
+        </div>
+        <div class="main-content">
+            <div class="tasks-banner">
+                <h2>📋 My Tasks</h2>
+                <div id="taskList" class="task-list">
                     {% if tasks %}
                     {% for task in tasks %}
-                    <div class="task-item {{ task.priority }}" data-status="{{ task.status }}">
-                        <h3>{{ task.title }}</h3>
-                        <p>{{ task.description }}</p>
-                        <p><strong>Assigned to:</strong> {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}</p>
-                        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-                        <p><strong>Status:</strong> {{ task.get_status_display }}</p>
-                        <p><strong>Deadline:</strong> <span id="deadline-{{ task.id }}">{{ task.deadline }}</span></p>
-                        <p><strong>Time Remaining:</strong> <span id="countdown-{{ task.id }}"></span></p>
+                    <div class="task-card {{ task.status }} {{ task.priority }}" data-status="{{ task.status }}" data-task-id="{{ task.id }}">
+                        <div class="task-card-content">
+                            <h3>{{ task.title }}</h3>
+                            <p>{{ task.description }}</p>
+                            <p><strong>Assigned to:</strong> {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}</p>
+                            <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+                            <p><strong>Status:</strong> {{ task.get_status_display }}</p>
+                            <p><strong>Deadline:</strong> <span id="deadline-{{ task.id }}">{{ task.deadline }}</span></p>
+                            <p><strong>Time Remaining:</strong> <span id="countdown-{{ task.id }}"></span></p>
+                        </div>
                         {% if task.status != 'completed' %}
-                        <form action="{% url 'tasks:update_task_status' task.id %}" method="post"
-                            onsubmit="completeTask(event, '{{ task.id }}')">
+                        <form action="{% url 'tasks:update_task_status' task.id %}" method="post" onsubmit="completeTask(event, '{{ task.id }}')">
                             {% csrf_token %}
                             <input type="hidden" name="status" value="completed">
                             <button type="submit" class="complete-btn">✅ Complete</button>
                         </form>
                         {% endif %}
                     </div>
+
                     {% endfor %}
                     {% else %}
                     📋 No tasks available
                     {% endif %}
                 </div>
-
-                <!-- Pagination Controls -->
                 <div class="pagination">
                     <span class="step-links">
                         {% if page_obj.has_previous %}
                         <a href="?page=1">&laquo;</a>
                         <a href="?page={{ page_obj.previous_page_number }}">&#8249;</a>
                         {% endif %}
-
-                        <span class="current">
-                            {{ page_obj.number }}
-                        </span>
-
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <span class="current">{{ num }}</span>
+                        {% else %}
+                        <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                        {% endfor %}
                         {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}">&#8250;</a>
-                        <a href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                        <a href="?page={{ page_obj.next_page_number }}"> &#8250;</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a>
                         {% endif %}
                     </span>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="{% static 'js/user.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -159,7 +232,7 @@
         // Function to filter tasks by status
         function filterTasks(status) {
             console.log("Filtering tasks by status:", status); // Debugging
-            const tasks = document.querySelectorAll('.task-item');
+            const tasks = document.querySelectorAll('.task-card');
             tasks.forEach(task => {
                 const taskStatus = task.getAttribute('data-status');
                 if (status === 'all' || taskStatus === status) {
@@ -202,10 +275,28 @@
             return new Date(year, month, day, hour, minute);
         }
 
+        // Store interval IDs for each task
+        const countdownIntervals = {};
+
         // Function to calculate time remaining
         function updateCountdown(taskId, deadline) {
             const countdownElement = document.getElementById(`countdown-${taskId}`);
             if (!countdownElement) return;
+
+            // Check if task is completed
+            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+            if (taskElement && taskElement.getAttribute('data-status') === 'completed') {
+                countdownElement.textContent = "✅ Task completed";
+                countdownElement.style.color = "#28a745";
+                countdownElement.style.fontWeight = "600";
+                
+                // Clear the interval for this task
+                if (countdownIntervals[taskId]) {
+                    clearInterval(countdownIntervals[taskId]);
+                    delete countdownIntervals[taskId];
+                }
+                return;
+            }
 
             const deadlineDate = parseDeadline(deadline);
             if (isNaN(deadlineDate.getTime())) {
@@ -231,12 +322,24 @@
 
         // Function to initialize countdowns
         function initializeCountdowns() {
-            document.querySelectorAll('.task-item').forEach(task => {
+            document.querySelectorAll('.task-card').forEach(task => {
                 const taskId = task.querySelector('span[id^="countdown-"]').id.split('-')[1];
                 const deadline = task.querySelector('span[id^="deadline-"]').textContent.trim();
+                
+                // Initial update
                 updateCountdown(taskId, deadline);
-                setInterval(() => updateCountdown(taskId, deadline), 1000);
+                
+                // Set interval and store the ID
+                countdownIntervals[taskId] = setInterval(() => updateCountdown(taskId, deadline), 1000);
             });
+        }
+
+        // Function to stop countdown for a specific task
+        function stopCountdown(taskId) {
+            if (countdownIntervals[taskId]) {
+                clearInterval(countdownIntervals[taskId]);
+                delete countdownIntervals[taskId];
+            }
         }
 
         // Function to confirm task completion using SweetAlert2
@@ -262,13 +365,33 @@
                             csrfmiddlewaretoken: "{{ csrf_token }}"
                         },
                         success: function (response) {
+                            // Update task status in UI
+                            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+                            if (taskElement) {
+                                taskElement.classList.add('completed');
+                                taskElement.setAttribute('data-status', 'completed');
+                                
+                                // Stop countdown and show completed message
+                                stopCountdown(taskId);
+                                
+                                // Hide the complete button
+                                const completeBtn = taskElement.querySelector('.complete-btn');
+                                if (completeBtn) {
+                                    completeBtn.style.display = 'none';
+                                }
+                                
+                                // Hide the form
+                                const form = taskElement.querySelector('form');
+                                if (form) {
+                                    form.style.display = 'none';
+                                }
+                            }
+                            
                             Swal.fire(
                                 'Completed!',
                                 'The task has been marked as completed.',
                                 'success'
-                            ).then(() => {
-                                location.reload(); // Refresh the page after completion
-                            });
+                            );
                         },
                         error: function (xhr, status, error) {
                             Swal.fire(
@@ -287,7 +410,76 @@
             initializeCountdowns();
             hideMessages();
         };
+
+        // Hamburger menu toggle
+        (function() {
+            var hamburgerMenu = document.getElementById('hamburger-menu');
+            var sidebarMenu = document.querySelector('.sidebar');
+            var sidebarOverlay = document.getElementById('sidebar-overlay');
+            if (hamburgerMenu && sidebarMenu && sidebarOverlay) {
+                hamburgerMenu.addEventListener('click', function() {
+                    sidebarMenu.classList.toggle('active');
+                    if (sidebarMenu.classList.contains('active')) {
+                        sidebarOverlay.style.display = 'block';
+                        sidebarOverlay.removeAttribute('aria-hidden');
+                        sidebarOverlay.removeAttribute('inert');
+                    } else {
+                        sidebarOverlay.style.display = 'none';
+                        sidebarOverlay.setAttribute('aria-hidden', 'true');
+                        sidebarOverlay.setAttribute('inert', '');
+                    }
+                    hamburgerMenu.setAttribute('aria-expanded', sidebarMenu.classList.contains('active'));
+                });
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebarMenu.classList.remove('active');
+                    sidebarOverlay.style.display = 'none';
+                    sidebarOverlay.setAttribute('aria-hidden', 'true');
+                    sidebarOverlay.setAttribute('inert', '');
+                    hamburgerMenu.setAttribute('aria-expanded', 'false');
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebarMenu.classList.contains('active')) {
+                        sidebarMenu.classList.remove('active');
+                        sidebarOverlay.style.display = 'none';
+                        sidebarOverlay.setAttribute('aria-hidden', 'true');
+                        sidebarOverlay.setAttribute('inert', '');
+                        hamburgerMenu.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        })();
     </script>
+
+    <!-- Add overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebar-overlay" style="display:none;"></div>
+
+    <!-- Wrap main content for better padding on all screens -->
+    <div class="responsive-container" style="max-width:1200px;margin:0 auto;padding:0 2vw;">
+        <!-- ... existing dashboard-container and content ... -->
+    </div>
+
+    <style>
+    /* Overlay for mobile sidebar */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(44,62,80,0.35);
+        z-index: 1999;
+        transition: opacity 0.3s;
+    }
+    @media (min-width: 901px) {
+        .sidebar-overlay { display: none !important; }
+    }
+
+    /* Responsive container for main content */
+    .responsive-container { max-width: 1200px; margin: 0 auto; padding: 0 2vw; }
+
+    /* Hamburger focus/active state */
+    .hamburger:focus, .hamburger:active {
+        outline: 2px solid #3498db;
+        outline-offset: 2px;
+    }
+    </style>
 </body>
 
 </html>

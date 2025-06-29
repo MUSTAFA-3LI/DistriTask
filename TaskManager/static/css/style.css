@@ -333,6 +333,43 @@ body {
     flex-direction: column;
     gap: 10px;
 }
+.chat-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: #fff;
+    font-weight: 500;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+    padding: 12px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.chat-btn:hover, .chat-btn:focus {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+    color: #fff;
+}
+
+.chat-btn i {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-size: 1.2rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.chat-btn:hover i, .chat-btn:focus i {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
 
 .change-password-link {
     color: #fff;
@@ -1413,4 +1450,169 @@ h1 {
         padding: 10px 15px;
         font-size: 0.9rem;
     }
+}
+
+/* --- Responsive Sidebar & Hamburger --- */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    z-index: 2001;
+    margin-right: 10px;
+}
+.hamburger span {
+    height: 4px;
+    width: 100%;
+    background: #3498db;
+    margin: 4px 0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(44,62,80,0.35);
+    z-index: 1999;
+    transition: opacity 0.3s;
+    display: none;
+}
+@media (min-width: 901px) {
+    .sidebar-overlay { display: none !important; }
+}
+
+@media (max-width: 900px) {
+    .hamburger {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        width: 220px;
+        height: 100vh;
+        z-index: 2000;
+        transition: left 0.3s cubic-bezier(.4,0,.2,1);
+        box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        padding: 30px 15px 15px 15px;
+    }
+    .sidebar.active {
+        left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 10px 4vw;
+    }
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px 4vw 6px 4vw;
+        height: auto;
+        min-height: 0;
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+    }
+    .header-left {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .search-section {
+        width: 100%;
+        margin: 0 0 10px 0;
+        order: 2;
+    }
+    .search-input {
+        width: 100%;
+        min-width: 0;
+        font-size: 1rem;
+        padding: 12px 45px 12px 18px;
+    }
+    .header-right {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 0;
+        order: 3;
+    }
+    .profile-btn, .dropdown-btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px 10px;
+    }
+    .task-list {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+    .task-card {
+        padding: 20px;
+    }
+    .task-card h3 {
+        font-size: 1.1rem;
+    }
+    .task-card p {
+        font-size: 0.9rem;
+    }
+    .task-card-buttons {
+        padding: 15px;
+    }
+    .update-task-btn,
+    .delete-task-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    .employees-list {
+        grid-template-columns: 1fr;
+    }
+    .employee-card {
+        min-width: auto;
+    }
+    .employees-section {
+        padding: 20px;
+    }
+    .employee-card h3 {
+        font-size: 1.1rem;
+    }
+    .employee-card p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        padding: 6px 2vw 4px 2vw;
+    }
+    .header-left .project-name {
+        font-size: 1rem;
+    }
+    .search-section {
+        margin-bottom: 8px;
+    }
+    .main-content {
+        padding: 6px 2vw;
+    }
+    .sidebar {
+        width: 80vw;
+        min-width: 0;
+        padding: 20px 8px;
+    }
+}
+
+.header {
+    backdrop-filter: blur(8px);
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 4px 18px rgba(44,62,80,0.08);
+    border-bottom: 1px solid rgba(44,62,80,0.06);
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.header, .header * {
+    transition: all 0.2s cubic-bezier(.4,0,.2,1);
 }

@@ -1,147 +1,124 @@
-let tasks = [];
-
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('taskForm').style.display = 'none';
-});
-
-// Show Task Form
-function showTaskForm() {
-    document.getElementById('taskForm').style.display = 'block';
-}
-
-// Hide Task Form
+// Function to hide the form
 function hideTaskForm() {
-    document.getElementById('taskForm').style.display = 'none';
+    document.getElementById("taskForm").style.display = "none";
 }
 
-// Add Task
-function addTask() {
-    const employeeInput = document.getElementById('taskEmployee');
-    const nameInput = document.getElementById('taskName');
-    const descriptionInput = document.getElementById('taskDescription');
-    const deadlineInput = document.getElementById('taskDeadline');
-    const priorityInput = document.getElementById('taskPriority');
-    const statusInput = document.getElementById('taskStatus');
+// Function to parse deadline (used for both add and update)
+function parseDeadline(deadline) {
+    const months = {
+        "January": 0, "February": 1, "March": 2, "April": 3, "May": 4, "June": 5,
+        "July": 6, "August": 7, "September": 8, "October": 9, "November": 10, "December": 11
+    };
 
-    if (!employeeInput || !nameInput || !descriptionInput || !deadlineInput || !priorityInput || !statusInput) {
-        console.error('One or more input elements not found');
-        return;
+    const parts = deadline.split(/[\s,]+/);
+    const month = months[parts[0]];
+    const day = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    const timeParts = parts[3].split(":");
+    let hour = parseInt(timeParts[0], 10);
+    const minute = parseInt(timeParts[1], 10);
+    const period = parts[4];
+
+    // Convert to 24-hour format
+    if (period === "p.m." && hour !== 12) {
+        hour += 12;
+    } else if (period === "a.m." && hour === 12) {
+        hour = 0;
     }
 
-    const employee = employeeInput.value.trim();
-    const name = nameInput.value.trim();
-    const description = descriptionInput.value.trim();
-    const deadline = deadlineInput.value.trim();
-    const priority = priorityInput.value;
-    const status = statusInput.value;
-
-    if (!name || !deadline) {
-        alert('Please enter task name and deadline');
-        return;
-    }
-
-    const task = { employee, name, description, deadline, priority, status };
-    tasks.push(task);
-    displayTasks('all');
-    hideTaskForm();
-    
-    // Clear form inputs after adding task
-    employeeInput.value = '';
-    nameInput.value = '';
-    descriptionInput.value = '';
-    deadlineInput.value = '';
-    priorityInput.value = 'low';
-    statusInput.value = 'pending';
+    return new Date(year, month, day, hour, minute);
 }
 
-// Display Tasks
-function displayTasks(filter) {
-    const taskList = document.getElementById('taskList');
-    if (!taskList) {
-        console.error('Task list element not found');
-        return;
-    }
-    
-    taskList.innerHTML = '';
-    
-    const filteredTasks = filter === 'all' ? tasks : tasks.filter(task => task.status === filter);
-    
-    if (filteredTasks.length === 0) {
-        taskList.innerHTML = '📋 No tasks available';
-        return;
-    }
-    
-    filteredTasks.forEach(task => {
-        let div = document.createElement('div');
-        div.className = `task ${task.priority}`;
-        div.innerHTML = `
-            <h3>📌 ${task.name}</h3>
-            <p>👤 Employee: ${task.employee}</p>
-            <p>📝 ${task.description}</p>
-            <p>🕒 ${new Date(task.deadline).toLocaleString()}</p>
-            <p>Status: ${task.status}</p>
-        `;
-        taskList.appendChild(div);
+function filterTasks(status) {
+    document.querySelectorAll('.task-card').forEach(task => {
+        task.style.display = (status === "all" || task.dataset.status === status) ? "block" : "none";
     });
 }
 
-// Filter Tasks
-function filterTasks(status) {
-    if (status === 'in-progress') {
-        const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
+// Store interval IDs for each task
+const countdownIntervals = {};
 
-        if (inProgressTasks.length === 0) {
-            document.getElementById('taskList').innerHTML = '⚙️ No In-Progress Tasks';
-            return;
+// Function to calculate time remaining
+function updateCountdown(taskId, deadline) {
+    const countdownElement = document.getElementById(`countdown-${taskId}`);
+    if (!countdownElement) return;
+
+    // Check if task is completed
+    const taskElement = document.querySelector(`[data-status="completed"][data-task-id="${taskId}"]`);
+    if (taskElement) {
+        countdownElement.textContent = "✅ Task completed";
+        countdownElement.style.color = "#28a745";
+        countdownElement.style.fontWeight = "600";
+        
+        // Clear the interval for this task
+        if (countdownIntervals[taskId]) {
+            clearInterval(countdownIntervals[taskId]);
+            delete countdownIntervals[taskId];
         }
+        return;
+    }
 
-        displayTasks('in-progress');
-    } else {
-        displayTasks(status);
+    const deadlineDate = parseDeadline(deadline);
+    if (isNaN(deadlineDate.getTime())) {
+        countdownElement.textContent = "Invalid deadline!";
+        return;
+    }
+
+    const now = new Date().getTime();
+    const timeRemaining = deadlineDate.getTime() - now;
+
+    if (timeRemaining <= 0) {
+        countdownElement.textContent = "Deadline passed!";
+        return;
+    }
+
+    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+    countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+// Function to initialize countdowns
+function initializeCountdowns() {
+    document.querySelectorAll('.task-card').forEach(task => {
+        const countdownElement = task.querySelector('span[id^="countdown-"]');
+        if (!countdownElement) return;
+        
+        const taskId = countdownElement.id.split('-')[1];
+        const deadlineElement = task.querySelector('span[id^="deadline-"]');
+        if (!deadlineElement) return;
+        
+        const deadline = deadlineElement.textContent.trim();
+        
+        // Initial update
+        updateCountdown(taskId, deadline);
+        
+        // Set interval and store the ID
+        countdownIntervals[taskId] = setInterval(() => updateCountdown(taskId, deadline), 1000);
+    });
+}
+
+// Function to stop countdown for a specific task
+function stopCountdown(taskId) {
+    if (countdownIntervals[taskId]) {
+        clearInterval(countdownIntervals[taskId]);
+        delete countdownIntervals[taskId];
     }
 }
 
-// Logout Function with Confirmation
-function logout() {
-    // Show confirmation message
-    const confirmLogout = confirm("Are you sure you want to logout?");
-    
-    // If user confirms, redirect to homepage
-    if (confirmLogout) {
-        window.location.href = "../index.html"; // Replace with your homepage URL
-    }
-    // If user cancels, do nothing
-}
+// Function to hide messages after 5 seconds
+function hideMessages() {
+    const messages = document.querySelectorAll('.alert');
+    messages.forEach(message => {
+        setTimeout(() => {
+            message.style.opacity = '0';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 1000); // Fade out duration
+        }, 5000); // 5 seconds delay
+    });
+};
 
-function toggleDropdown() {
-    const dropdown = document.getElementById('userDropdown');
-    dropdown.classList.toggle('show');
-}
-
-// Close the dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('userDropdown');
-    const profile = document.querySelector('.profile');
-    
-    if (!profile.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.remove('show');
-    }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;

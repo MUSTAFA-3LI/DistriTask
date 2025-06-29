@@ -9,6 +9,7 @@ class Command(BaseCommand):
     help = 'add the database with users and project-related tasks'
 
     def handle(self, *args, **kwargs):
+        Task.objects.all().delete()
         # Define users
         users_data = [
             {
@@ -111,13 +112,28 @@ class Command(BaseCommand):
 
             # Emad's tasks
             {
-                'title': 'Build Employee List API',
-                'description': 'Provide an endpoint to list, filter, and paginate employee records.',
+                'title': 'Implement Employee Task View',
+                'description': 'Develop a secure view that displays tasks specific to the logged-in employee.',
                 'assigned_to': user_objects['emadbadr227@gmail.com'],
             },
             {
-                'title': 'Implement Employee Profile Update',
-                'description': 'Enable backend logic to allow employees to update their info.',
+                'title': 'Write Unit Tests for User and Task Models',
+                'description': 'Create unit tests for user creation, task-user linking, and employee task view logic.',
+                'assigned_to': user_objects['emadbadr227@gmail.com'],
+            },
+            {
+                'title': 'Setup Test Data for Employees and Tasks',
+                'description': 'Insert sample users and tasks to test proper distribution of tasks among employees.',
+                'assigned_to': user_objects['emadbadr227@gmail.com'],
+            },
+            {
+                'title': 'Integrate Django Flash Messages',
+                'description': 'Implement success messages for task operations and user login/logout actions.',
+                'assigned_to': user_objects['emadbadr227@gmail.com'],
+            },
+            {
+                'title': 'Add Employee Analytics to Manager Dashboard',
+                'description': 'Display total employees and task summaries to visualize workload per employee.',
                 'assigned_to': user_objects['emadbadr227@gmail.com'],
             },
 
