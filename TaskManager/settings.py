@@ -107,7 +107,7 @@ WSGI_APPLICATION = 'TaskManager.wsgi.application'
 # }
 
 
-# FOR DOCKER DATABASE
+# FOR DOCKER AND KUBERNETES DATABASE 
 
 DATABASES = {
     'default': {
