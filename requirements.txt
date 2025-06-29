@@ -23,3 +23,6 @@ wcwidth==0.2.13
 PyMySQL
 cryptography
 gunicorn
+djangorestframework
+daphne
+channels
