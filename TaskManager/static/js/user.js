@@ -2,6 +2,7 @@ let tasks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     loadTasks();
+    initSidebar();
 });
 
 // Load Tasks from LocalStorage
@@ -16,6 +17,8 @@ function loadTasks() {
 // Display Tasks
 function displayTasks(filter) {
     const tasksGrid = document.querySelector(".tasks-grid");
+    if (!tasksGrid) return;
+    
     tasksGrid.innerHTML = '';
     
     let filteredTasks = tasks;
@@ -190,3 +193,162 @@ function completeTaskWithConfirmation(event, taskId) {
         console.log(`Task ${taskId} marked as completed`);
     }
 }
+
+// Search function for tasks
+function searchTasks(query) {
+    const tasks = document.querySelectorAll('.task-card');
+    const searchTerm = query.toLowerCase();
+    
+    tasks.forEach(task => {
+        const title = task.querySelector('h3').textContent.toLowerCase();
+        const description = task.querySelector('p').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            task.style.display = 'block';
+        } else {
+            task.style.display = 'none';
+        }
+    });
+}
+
+// Hide messages after 5 seconds
+function hideMessages() {
+    setTimeout(() => {
+        const messages = document.querySelectorAll('.alert');
+        messages.forEach(message => {
+            message.style.opacity = '0';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 300);
+        });
+    }, 5000);
+}
+
+// ===== MOBILE SIDEBAR FUNCTIONALITY =====
+
+// Sidebar Toggle Function
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const hamburger = document.querySelector('.hamburger');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const body = document.body;
+    
+    if (sidebar && hamburger) {
+        sidebar.classList.toggle('active');
+        hamburger.classList.toggle('active');
+        
+        if (overlay) {
+            overlay.classList.toggle('active');
+        }
+        
+        // Prevent body scroll when sidebar is open
+        if (sidebar.classList.contains('active')) {
+            body.classList.add('sidebar-open');
+        } else {
+            body.classList.remove('sidebar-open');
+        }
+    }
+}
+
+// Close Sidebar Function
+function closeSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const hamburger = document.querySelector('.hamburger');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const body = document.body;
+    
+    if (sidebar) {
+        sidebar.classList.remove('active');
+    }
+    
+    if (hamburger) {
+        hamburger.classList.remove('active');
+    }
+    
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+    
+    body.classList.remove('sidebar-open');
+}
+
+// Initialize Sidebar Events
+function initSidebar() {
+    const hamburger = document.querySelector('.hamburger');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    console.log('Initializing sidebar...');
+    console.log('Hamburger found:', hamburger);
+    console.log('Overlay found:', overlay);
+    
+    // Hamburger click
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Hamburger clicked!');
+            toggleSidebar();
+        });
+    } else {
+        console.error('Hamburger button not found!');
+    }
+    
+    // Overlay click to close
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeSidebar();
+        });
+    }
+    
+    // Escape key to close
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+    
+    // Close sidebar when clicking on sidebar links (mobile)
+    const sidebarLinks = document.querySelectorAll('.sidebar a');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        });
+    });
+    
+    // Touch/swipe to close sidebar
+    let startX = 0;
+    let currentX = 0;
+    
+    document.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+    });
+    
+    document.addEventListener('touchmove', function(e) {
+        currentX = e.touches[0].clientX;
+    });
+    
+    document.addEventListener('touchend', function(e) {
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            const diffX = startX - currentX;
+            if (diffX > 50) { // Swipe left to close
+                closeSidebar();
+            }
+        }
+    });
+    
+    // Re-initialize on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 900) {
+            closeSidebar();
+        }
+    });
+}
+
+// Initialize when DOM is loaded
+window.addEventListener('load', function() {
+    hideMessages();
+});

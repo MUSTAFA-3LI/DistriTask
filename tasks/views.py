@@ -83,7 +83,7 @@ def add_task(request):
 
         # Find an available employee in the same category
         suitable_employee = User.objects.filter(role='employee', category=category) \
-                                        .annotate(task_count=Count('task', filter=~Q(task__status='completed'))) \
+                                        .annotate(task_count=Count('assigned_tasks', filter=~Q(assigned_tasks__status='completed'))) \
                                         .order_by('task_count') \
                                         .first()
 
