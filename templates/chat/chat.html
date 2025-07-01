@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Chat - Task Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="{% static 'imgs/fav.png' %}" type="image/png">
+
     
     <style>
         :root {
@@ -745,12 +747,10 @@
 
         function updateUnreadBadges() {
             console.log('Fetching unread counts...');
-            const csrftoken = getCookie('csrftoken');
             fetch('/chat/unread_counts/', {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken // Add CSRF token
+                    'Content-Type': 'application/json'
                 },
                 credentials: 'include'
             })
@@ -770,8 +770,10 @@
                     if (badge) {
                         badge.textContent = count > 0 ? count : '';
                         badge.style.display = count > 0 ? 'inline-block' : 'none';
+                        badge.style.visibility = 'visible';
+                        console.log(`Badge ${badgeId} updated: textContent=${badge.textContent}, display=${badge.style.display}, visibility=${badge.style.visibility}`);
                     } else {
-                        console.warn(`Badge not found for ID: ${badgeId}`);
+                        console.error(`Badge not found for ID: ${badgeId}`);
                     }
                 });
             })

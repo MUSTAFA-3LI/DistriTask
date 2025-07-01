@@ -28,16 +28,26 @@
     {% endif %}
 
     <div class="dashboard-container">
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
         <!-- Header -->
         <header class="header">
             <!-- Header Left -->
             <div class="header-left">
-                
+                <!-- Hamburger menu for mobile -->
+                <button class="hamburger" id="hamburger-menu" onclick="toggleSidebar()" aria-label="Open sidebar" aria-controls="sidebar" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <h1 class="project-name">
                     <a href="{% url 'tasks:manager_tasks' %}" style="text-decoration: none; color: inherit;">
                         Task Management
                     </a>
                 </h1>
+                <!-- Test button for sidebar -->
+                <!-- <button onclick="testSidebar()" style="background: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; margin-left: 10px;">Test Sidebar</button> -->
             </div>
 
             <!-- Search Section -->
@@ -243,6 +253,139 @@
     </div>
 
     <script>
+    // ===== MOBILE SIDEBAR FUNCTIONALITY =====
+    
+    // Sidebar Toggle Function
+    function toggleSidebar() {
+        console.log('toggleSidebar function called');
+        const sidebar = document.querySelector('.sidebar');
+        const hamburger = document.querySelector('.hamburger');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const body = document.body;
+        
+        console.log('Sidebar found:', sidebar);
+        console.log('Hamburger found:', hamburger);
+        console.log('Overlay found:', overlay);
+        
+        if (sidebar && hamburger) {
+            sidebar.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+            
+            // Prevent body scroll when sidebar is open
+            if (sidebar.classList.contains('active')) {
+                body.classList.add('sidebar-open');
+                console.log('Sidebar opened');
+            } else {
+                body.classList.remove('sidebar-open');
+                console.log('Sidebar closed');
+            }
+        } else {
+            console.error('Sidebar or hamburger not found!');
+        }
+    }
+    
+    // Close Sidebar Function
+    function closeSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const hamburger = document.querySelector('.hamburger');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const body = document.body;
+        
+        if (sidebar) {
+            sidebar.classList.remove('active');
+        }
+        
+        if (hamburger) {
+            hamburger.classList.remove('active');
+        }
+        
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+        
+        body.classList.remove('sidebar-open');
+    }
+    
+    // Initialize Sidebar Events
+    function initSidebar() {
+        console.log('Initializing sidebar...');
+        const hamburger = document.querySelector('.hamburger');
+        const overlay = document.querySelector('.sidebar-overlay');
+        
+        console.log('Hamburger found in init:', hamburger);
+        console.log('Overlay found in init:', overlay);
+        
+        // Hamburger click
+        if (hamburger) {
+            hamburger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Hamburger clicked!');
+                toggleSidebar();
+            });
+        } else {
+            console.error('Hamburger button not found!');
+        }
+        
+        // Overlay click to close
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSidebar();
+            });
+        }
+        
+        // Escape key to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+        
+        // Close sidebar when clicking on sidebar links (mobile)
+        const sidebarLinks = document.querySelectorAll('.sidebar a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    closeSidebar();
+                }
+            });
+        });
+        
+        // Touch/swipe to close sidebar
+        let startX = 0;
+        let currentX = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        document.addEventListener('touchmove', function(e) {
+            currentX = e.touches[0].clientX;
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar && sidebar.classList.contains('active')) {
+                const diffX = startX - currentX;
+                if (diffX > 50) { // Swipe left to close
+                    closeSidebar();
+                }
+            }
+        });
+        
+        // Re-initialize on window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                closeSidebar();
+            }
+        });
+    }
+    
     // Function to handle logout
     function logout() {
         Swal.fire({
@@ -395,9 +538,47 @@
 
     // Initialize on page load
     window.onload = function () {
-        initializeCountdowns();
-        hideMessages();
+        console.log('Page loaded, initializing...');
+        initSidebar();
+        if (typeof initializeCountdowns === 'function') {
+            initializeCountdowns();
+        }
+        if (typeof hideMessages === 'function') {
+            hideMessages();
+        }
+        
+        // Test hamburger button
+        const hamburger = document.querySelector('.hamburger');
+        console.log('Hamburger in window.onload:', hamburger);
+        if (hamburger) {
+            console.log('Hamburger styles:', window.getComputedStyle(hamburger));
+            console.log('Hamburger display:', window.getComputedStyle(hamburger).display);
+            console.log('Hamburger visibility:', window.getComputedStyle(hamburger).visibility);
+            console.log('Hamburger opacity:', window.getComputedStyle(hamburger).opacity);
+        }
     };
+    
+    // Also initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing sidebar...');
+        initSidebar();
+        
+        // Test hamburger button
+        const hamburger = document.querySelector('.hamburger');
+        console.log('Hamburger in DOMContentLoaded:', hamburger);
+        if (hamburger) {
+            console.log('Hamburger styles:', window.getComputedStyle(hamburger));
+            console.log('Hamburger display:', window.getComputedStyle(hamburger).display);
+            console.log('Hamburger visibility:', window.getComputedStyle(hamburger).visibility);
+            console.log('Hamburger opacity:', window.getComputedStyle(hamburger).opacity);
+        }
+    });
+    
+    // Test function to manually trigger sidebar
+    function testSidebar() {
+        console.log('Testing sidebar manually...');
+        toggleSidebar();
+    }
     </script>
     <script src="{% static 'js/script.js' %}"></script>
 </div>
