@@ -1317,18 +1317,12 @@ h1 {
         background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
         padding: 30px 20px 20px 20px;
         transform: none;
-<<<<<<< HEAD
-        overflow-y: auto;
-        border-radius: 0;
-        will-change: left;
-=======
         overflow-y: scroll;
         border-radius: 0;
         will-change: left;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: thin;
         scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
->>>>>>> upstream/main
     }
     
     /* Show Sidebar when Active */
@@ -1356,39 +1350,6 @@ h1 {
     
     /* Header adjustments */
     .header {
-<<<<<<< HEAD
-        flex-direction: column;
-        align-items: stretch;
-        padding: 15px;
-        height: auto;
-        min-height: 0;
-        position: relative;
-        z-index: 1000;
-        background: white;
-    }
-    
-    .header-left {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        margin-bottom: 15px;
-    }
-    
-    .search-section {
-        width: 100%;
-        margin: 0 0 15px 0;
-        order: 2;
-    }
-    
-    .header-right {
-        flex-direction: row;
-        justify-content: flex-end;
-        gap: 10px;
-        width: 100%;
-        order: 3;
-    }
-=======
         flex-direction: column !important;
         align-items: stretch !important;
         padding: 15px !important;
@@ -1461,7 +1422,6 @@ h1 {
     .notification-time {
         font-size: 0.75rem !important;
     }
->>>>>>> upstream/main
 }
 
 /* Small Mobile Sidebar */
@@ -1471,8 +1431,6 @@ h1 {
         max-width: 300px;
         padding: 20px 15px;
         left: -100%;
-<<<<<<< HEAD
-=======
         overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: thin;
@@ -1481,7 +1439,6 @@ h1 {
         height: 100vh;
         display: flex;
         flex-direction: column;
->>>>>>> upstream/main
     }
     
     .sidebar.active {
@@ -1494,21 +1451,15 @@ h1 {
         color: white;
         text-align: center;
         font-weight: 600;
-<<<<<<< HEAD
-=======
         flex-shrink: 0;
->>>>>>> upstream/main
     }
     
     .sidebar ul {
         margin-bottom: 20px;
         padding: 0;
         list-style: none;
-<<<<<<< HEAD
-=======
         flex: 1;
         overflow-y: auto;
->>>>>>> upstream/main
     }
     
     .sidebar ul li {
@@ -1550,12 +1501,6 @@ h1 {
     }
     
     .sidebar-buttons {
-<<<<<<< HEAD
-        margin-top: 20px;
-        gap: 8px;
-        display: flex;
-        flex-direction: column;
-=======
         margin-top: auto;
         padding-top: 20px;
         gap: 8px;
@@ -1568,7 +1513,6 @@ h1 {
         background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
         padding-bottom: 20px;
         border-top: 2px solid rgba(255, 255, 255, 0.1);
->>>>>>> upstream/main
     }
     
     .chat-btn, .change-password-link, .logout-btn {
@@ -1583,11 +1527,8 @@ h1 {
         border: none;
         cursor: pointer;
         font-weight: 500;
-<<<<<<< HEAD
-=======
         width: 100%;
         justify-content: center;
->>>>>>> upstream/main
     }
     
     .chat-btn {
@@ -1634,8 +1575,6 @@ h1 {
     .sidebar {
         width: 90vw;
         padding: 15px 10px;
-<<<<<<< HEAD
-=======
         overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: thin;
@@ -1644,21 +1583,17 @@ h1 {
         height: 100vh;
         display: flex;
         flex-direction: column;
->>>>>>> upstream/main
     }
     
     .sidebar h2 {
         font-size: 1.1rem;
         margin-bottom: 15px;
-<<<<<<< HEAD
-=======
         flex-shrink: 0;
     }
     
     .sidebar ul {
         flex: 1;
         overflow-y: auto;
->>>>>>> upstream/main
     }
     
     .sidebar ul li a {
@@ -1671,75 +1606,6 @@ h1 {
         padding: 6px;
     }
     
-<<<<<<< HEAD
-    .chat-btn, .change-password-link, .logout-btn {
-        padding: 10px 12px;
-        font-size: 0.85rem;
-    }
-}
-
-/* Sidebar Overlay Fix */
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(44, 62, 80, 0.35);
-    z-index: 1999;
-    transition: opacity 0.3s;
-    backdrop-filter: blur(2px);
-    display: none;
-    opacity: 0;
-}
-
-@media (max-width: 900px) {
-    .sidebar-overlay {
-        display: none;
-        opacity: 0;
-    }
-    
-    .sidebar-overlay.active {
-        display: block;
-        opacity: 1;
-    }
-}
-
-/* Desktop - Hide overlay */
-@media (min-width: 901px) {
-    .sidebar-overlay {
-        display: none !important;
-    }
-}
-
-/* Prevent body scroll when sidebar is open */
-body.sidebar-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-}
-
-/* Sidebar Scrollbar */
-@media (max-width: 900px) {
-    .sidebar::-webkit-scrollbar {
-        width: 4px;
-    }
-    
-    .sidebar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 2px;
-    }
-    
-    .sidebar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 2px;
-    }
-    
-    .sidebar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.5);
-    }
-}
-=======
     .sidebar-buttons {
         margin-top: auto;
         flex-shrink: 0;
@@ -1855,5 +1721,3 @@ body.sidebar-open {
         background: transparent;
     }
 }
-
->>>>>>> upstream/main

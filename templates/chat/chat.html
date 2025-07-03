@@ -8,8 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Chat - Task Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" href="{% static 'imgs/fav.png' %}" type="image/png">
-
     
     <style>
         :root {
@@ -715,10 +713,10 @@
                 if (chatSocket) {
                     chatSocket.close();
                 }
-                const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
                 chatSocket = new WebSocket(
-                    protocol + window.location.host + '/ws/chat/' + encodeURIComponent(roomName) + '/'
+                    'ws://' + window.location.host + '/ws/chat/' + encodeURIComponent(roomName) + '/'
                 );
+
                 chatSocket.onopen = function(e) {
                     console.log('WebSocket connection opened for room:', roomName);
                 };
@@ -938,10 +936,12 @@
 
         function updateUnreadBadges() {
             console.log('Fetching unread counts...');
+            const csrftoken = getCookie('csrftoken');
             fetch('/chat/unread_counts/', {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken // Add CSRF token
                 },
                 credentials: 'include'
             })
@@ -961,10 +961,8 @@
                     if (badge) {
                         badge.textContent = count > 0 ? count : '';
                         badge.style.display = count > 0 ? 'inline-block' : 'none';
-                        badge.style.visibility = 'visible';
-                        console.log(`Badge ${badgeId} updated: textContent=${badge.textContent}, display=${badge.style.display}, visibility=${badge.style.visibility}`);
                     } else {
-                        console.error(`Badge not found for ID: ${badgeId}`);
+                        console.warn(`Badge not found for ID: ${badgeId}`);
                     }
                 });
             })
