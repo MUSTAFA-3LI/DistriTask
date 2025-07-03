@@ -309,6 +309,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    /* Ensure buttons are always visible on mobile */
+    position: relative;
+    z-index: 10;
 }
 .chat-btn {
     background: linear-gradient(135deg, #3498db, #2980b9);
@@ -862,7 +865,7 @@ h1 {
     backdrop-filter: blur(5px) !important;
 }
 
-/* Dropdown Styles */
+/* Dropdown Styles - Manager Style */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -1314,9 +1317,18 @@ h1 {
         background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
         padding: 30px 20px 20px 20px;
         transform: none;
+<<<<<<< HEAD
         overflow-y: auto;
         border-radius: 0;
         will-change: left;
+=======
+        overflow-y: scroll;
+        border-radius: 0;
+        will-change: left;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+>>>>>>> upstream/main
     }
     
     /* Show Sidebar when Active */
@@ -1344,6 +1356,7 @@ h1 {
     
     /* Header adjustments */
     .header {
+<<<<<<< HEAD
         flex-direction: column;
         align-items: stretch;
         padding: 15px;
@@ -1375,6 +1388,80 @@ h1 {
         width: 100%;
         order: 3;
     }
+=======
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 15px !important;
+        height: auto !important;
+        min-height: 0 !important;
+        position: relative !important;
+        z-index: 1000 !important;
+        background: white !important;
+    }
+    
+    .header-left {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .search-section {
+        width: 100% !important;
+        margin: 0 0 15px 0 !important;
+        order: 2 !important;
+        max-width: none !important;
+    }
+    
+    .header-right {
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        width: 100% !important;
+        order: 3 !important;
+    }
+    
+    /* Hide profile name on mobile like manager page */
+    .profile-name {
+        display: none !important;
+    }
+    
+    /* Adjust profile padding for mobile */
+    .profile {
+        padding: 5px !important;
+        border-radius: 50% !important;
+    }
+    
+    /* Notification improvements for mobile */
+    .dropdown-btn {
+        padding: 6px !important;
+        min-width: 35px !important;
+        min-height: 35px !important;
+    }
+    
+    .notification-badge {
+        font-size: 0.6rem !important;
+        padding: 1px 4px !important;
+    }
+    
+    .dropdown-content {
+        min-width: 280px !important;
+        right: -10px !important;
+    }
+    
+    .notification-item {
+        padding: 12px 15px !important;
+    }
+    
+    .notification-text p {
+        font-size: 0.9rem !important;
+    }
+    
+    .notification-time {
+        font-size: 0.75rem !important;
+    }
+>>>>>>> upstream/main
 }
 
 /* Small Mobile Sidebar */
@@ -1384,6 +1471,17 @@ h1 {
         max-width: 300px;
         padding: 20px 15px;
         left: -100%;
+<<<<<<< HEAD
+=======
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+        /* Ensure proper height for mobile */
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+>>>>>>> upstream/main
     }
     
     .sidebar.active {
@@ -1396,12 +1494,21 @@ h1 {
         color: white;
         text-align: center;
         font-weight: 600;
+<<<<<<< HEAD
+=======
+        flex-shrink: 0;
+>>>>>>> upstream/main
     }
     
     .sidebar ul {
         margin-bottom: 20px;
         padding: 0;
         list-style: none;
+<<<<<<< HEAD
+=======
+        flex: 1;
+        overflow-y: auto;
+>>>>>>> upstream/main
     }
     
     .sidebar ul li {
@@ -1443,10 +1550,25 @@ h1 {
     }
     
     .sidebar-buttons {
+<<<<<<< HEAD
         margin-top: 20px;
         gap: 8px;
         display: flex;
         flex-direction: column;
+=======
+        margin-top: auto;
+        padding-top: 20px;
+        gap: 8px;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        /* Ensure buttons are always at bottom */
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        padding-bottom: 20px;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+>>>>>>> upstream/main
     }
     
     .chat-btn, .change-password-link, .logout-btn {
@@ -1461,6 +1583,11 @@ h1 {
         border: none;
         cursor: pointer;
         font-weight: 500;
+<<<<<<< HEAD
+=======
+        width: 100%;
+        justify-content: center;
+>>>>>>> upstream/main
     }
     
     .chat-btn {
@@ -1507,11 +1634,31 @@ h1 {
     .sidebar {
         width: 90vw;
         padding: 15px 10px;
+<<<<<<< HEAD
+=======
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+        /* Ensure proper height for mobile */
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+>>>>>>> upstream/main
     }
     
     .sidebar h2 {
         font-size: 1.1rem;
         margin-bottom: 15px;
+<<<<<<< HEAD
+=======
+        flex-shrink: 0;
+    }
+    
+    .sidebar ul {
+        flex: 1;
+        overflow-y: auto;
+>>>>>>> upstream/main
     }
     
     .sidebar ul li a {
@@ -1524,6 +1671,7 @@ h1 {
         padding: 6px;
     }
     
+<<<<<<< HEAD
     .chat-btn, .change-password-link, .logout-btn {
         padding: 10px 12px;
         font-size: 0.85rem;
@@ -1591,3 +1739,121 @@ body.sidebar-open {
         background: rgba(255, 255, 255, 0.5);
     }
 }
+=======
+    .sidebar-buttons {
+        margin-top: auto;
+        flex-shrink: 0;
+        padding-bottom: 15px;
+    }
+    
+    .chat-btn, .change-password-link, .logout-btn {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Sidebar Overlay Fix */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(44, 62, 80, 0.35);
+    z-index: 1999;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+    display: none;
+    opacity: 0;
+}
+
+@media (max-width: 900px) {
+    .sidebar-overlay {
+        display: none;
+        opacity: 0;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+}
+
+/* Desktop - Hide overlay */
+@media (min-width: 901px) {
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+/* Prevent body scroll when sidebar is open */
+body.sidebar-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+/* Enhanced Mobile Sidebar Scrolling */
+@media (max-width: 900px) {
+    .sidebar {
+        /* Ensure smooth scrolling on mobile */
+        scroll-behavior: smooth;
+        /* Prevent horizontal scroll */
+        overflow-x: hidden;
+        /* Better touch scrolling */
+        -webkit-overflow-scrolling: touch;
+        /* Momentum scrolling for iOS */
+        -webkit-overflow-scrolling: touch;
+        /* Firefox scrollbar styling */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+    }
+    
+    /* Ensure sidebar content doesn't overflow */
+    .sidebar > * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Better spacing for mobile scrolling */
+    .sidebar ul {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+    
+    .sidebar-buttons {
+        margin-top: auto;
+        padding-top: 20px;
+        padding-bottom: 70px;
+    }
+}
+
+/* Sidebar Scrollbar */
+@media (max-width: 900px) {
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 3px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.6);
+    }
+    
+    .sidebar::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+}
+
+>>>>>>> upstream/main

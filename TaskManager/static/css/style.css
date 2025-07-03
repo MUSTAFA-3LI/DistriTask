@@ -332,6 +332,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    /* Ensure buttons are always visible on mobile */
+    position: relative;
+    z-index: 10;
 }
 .chat-btn {
     background: linear-gradient(135deg, #3498db, #2980b9);
@@ -1411,15 +1414,19 @@ h1 {
 /* Deadline and Time Remaining Styling */
 .task-card p:has(span[id^="deadline-"]),
 .task-card p:has(span[id^="countdown-"]) {
-    background: rgba(0, 0, 0, 0.03);
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border-left: 4px solid #3498db;
+    font-weight: 500;
 }
 
 .task-card p:has(span[id^="countdown-"]) {
     color: #e74c3c;
-    font-weight: 500;
+    font-weight: 600;
+    background: rgba(231, 76, 60, 0.1);
+    border-left-color: #e74c3c;
 }
 
 /* Responsive Design */
@@ -1427,10 +1434,12 @@ h1 {
     .task-list {
         grid-template-columns: 1fr;
         padding: 15px;
+        gap: 15px;
     }
 
     .task-card {
         padding: 20px;
+        min-height: 250px;
     }
 
     .task-card h3 {
@@ -1439,6 +1448,14 @@ h1 {
 
     .task-card p {
         font-size: 0.9rem;
+        margin: 10px 0;
+        padding: 6px 0;
+    }
+
+    .task-card p:has(span[id^="deadline-"]),
+    .task-card p:has(span[id^="countdown-"]) {
+        padding: 10px 14px;
+        margin-top: 15px;
     }
 
     .task-card-buttons {
@@ -2173,13 +2190,21 @@ body.sidebar-open {
 .task-card {
     background: white;
     border-radius: 12px;
+<<<<<<< HEAD
     padding: 20px;
+=======
+    padding: 25px;
+>>>>>>> upstream/main
     margin-bottom: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-left: 4px solid #3498db;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+<<<<<<< HEAD
+=======
+    min-height: 280px;
+>>>>>>> upstream/main
 }
 
 .task-card:hover {
@@ -2196,8 +2221,14 @@ body.sidebar-open {
 
 .task-card p {
     color: #555;
+<<<<<<< HEAD
     margin: 8px 0;
     line-height: 1.5;
+=======
+    margin: 12px 0;
+    line-height: 1.6;
+    padding: 8px 0;
+>>>>>>> upstream/main
 }
 
 .task-card strong {
@@ -2385,7 +2416,11 @@ body.sidebar-open {
 /* Task List Grid */
 .task-list {
     display: grid;
+<<<<<<< HEAD
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+=======
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+>>>>>>> upstream/main
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -2637,6 +2672,11 @@ body.sidebar-open {
     border: none;
     cursor: pointer;
     font-weight: 500;
+<<<<<<< HEAD
+=======
+    width: 100%;
+    justify-content: center;
+>>>>>>> upstream/main
 }
 
 .chat-btn {
@@ -2726,12 +2766,32 @@ body.sidebar-open {
         overflow-y: auto !important;
         border-radius: 0 !important;
         will-change: left !important;
+<<<<<<< HEAD
+=======
+        /* Ensure proper height for mobile */
+        display: flex !important;
+        flex-direction: column !important;
+>>>>>>> upstream/main
     }
     
     .sidebar.active {
         left: 0 !important;
     }
     
+<<<<<<< HEAD
+=======
+    .sidebar h2 {
+        flex-shrink: 0 !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .sidebar ul {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        margin-bottom: 20px !important;
+    }
+    
+>>>>>>> upstream/main
     .sidebar h2, 
     .sidebar ul li a span, 
     .sidebar-buttons span {
@@ -2740,6 +2800,20 @@ body.sidebar-open {
         visibility: visible !important;
     }
     
+<<<<<<< HEAD
+=======
+    .sidebar-buttons {
+        margin-top: auto !important;
+        flex-shrink: 0 !important;
+        padding-bottom: 20px !important;
+        /* Ensure buttons are always at bottom */
+        position: sticky !important;
+        bottom: 0 !important;
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%) !important;
+        border-top: 2px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+>>>>>>> upstream/main
     .main-content {
         margin-left: 0 !important;
         padding: 15px !important;
@@ -2883,4 +2957,48 @@ body.sidebar-open {
         opacity: 0 !important;
         pointer-events: none !important;
     }
+<<<<<<< HEAD
+=======
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    overflow-y: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100vh !important;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.4) transparent;
+    /* Ensure proper flex layout */
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .sidebar h2 {
+    flex-shrink: 0 !important;
+  }
+  
+  .sidebar ul {
+    flex: 1 !important;
+    overflow-y: auto !important;
+  }
+  
+  .sidebar-buttons {
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
+    padding-bottom: 70px !important; 
+  }
+  
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.4);
+    border-radius: 3px;
+  }
+  .sidebar::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+  }
+>>>>>>> upstream/main
 }

@@ -46,7 +46,7 @@ function updateCountdown(taskId, deadline) {
     // Check if task is completed
     const taskElement = document.querySelector(`[data-status="completed"][data-task-id="${taskId}"]`);
     if (taskElement) {
-        countdownElement.textContent = "✅ Task completed";
+        countdownElement.textContent = " Task completed";
         countdownElement.style.color = "#28a745";
         countdownElement.style.fontWeight = "600";
         

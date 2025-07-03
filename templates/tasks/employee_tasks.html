@@ -27,16 +27,19 @@
     {% endif %}
 
     <div class="dashboard-container">
-        <!-- Header the same as manager -->
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <!-- Header -->
         <header class="header">
             <!-- Header Left -->
             <div class="header-left">
                 <!-- Hamburger menu for mobile -->
-                <div class="hamburger" id="hamburger-menu" aria-label="Open sidebar" aria-controls="sidebar" aria-expanded="false" tabindex="0">
+                <button class="hamburger" id="hamburger-menu" onclick="toggleSidebar()" aria-label="Open sidebar" aria-controls="sidebar" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
-                </div>
+                </button>
                 <h1 class="project-name">
                     <a href="{% url 'tasks:employee_tasks' %}" style="text-decoration: none; color: inherit;">
                         Task Management
@@ -54,7 +57,7 @@
             <div class="header-right">
                 <!-- notification list -->
                 <div class="dropdown">
-                    <button class="dropdown-btn">
+                    <button class="dropdown-btn" aria-label="Notifications">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </button>
@@ -93,7 +96,7 @@
                 </div>
                 <!-- Profile Dropdown -->
                 <div class="dropdown profile-dropdown">
-                    <button class="dropdown-btn profile-btn">
+                    <button class="dropdown-btn profile-btn" aria-label="Profile menu">
                         <img src="{% static 'imgs/images_user/picture admain.webp' %}" alt="Profile" class="profile-pic">
                         <span class="profile-name">{{ request.session.user_name }}</span>
                         <i class="fas fa-chevron-down"></i>
@@ -120,29 +123,39 @@
             </div>
         </header>
 
-        <!-- Sidebar and Main Content the same as manager -->
-        <div class="sidebar">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
             <h2> Dashboard</h2>
             <ul>
-                <li><a href="#" onclick="filterTasks('all')"><i class="fas fa-tasks"></i> All Tasks</a></li>
-                <li><a href="#" onclick="filterTasks('completed')"><i class="fas fa-check-circle"></i> Completed</a></li>
-                <li><a href="#" onclick="filterTasks('delayed')"><i class="fas fa-clock"></i> Delayed</a></li>
-                <li><a href="#" onclick="filterTasks('in_progress')"><i class="fas fa-cogs"></i> In Progress</a></li>
+                <li><a href="#" onclick="filterTasks('all')" class="filter-link active" data-filter="all">
+                    <i class="fas fa-tasks"></i> <span>All Tasks</span>
+                </a></li>
+                <li><a href="#" onclick="filterTasks('completed')" class="filter-link" data-filter="completed">
+                    <i class="fas fa-check-circle"></i> <span>Completed</span>
+                </a></li>
+                <li><a href="#" onclick="filterTasks('delayed')" class="filter-link" data-filter="delayed">
+                    <i class="fas fa-clock"></i> <span>Delayed</span>
+                </a></li>
+                <li><a href="#" onclick="filterTasks('in_progress')" class="filter-link" data-filter="in_progress">
+                    <i class="fas fa-cogs"></i> <span>In Progress</span>
+                </a></li>
             </ul>
-                <div class="sidebar-buttons">
-                    <!-- add button for chat -->
-                    <a href="{% url 'chat:employee_chat' %}" class="chat-btn">
-                        <i class="fas fa-comments"></i> Chat
-                    </a>
-                    <!-- add button for change password -->
+            <div class="sidebar-buttons">
+                <!-- add button for chat -->
+                <a href="{% url 'chat:employee_chat' %}" class="chat-btn">
+                    <i class="fas fa-comments"></i> <span>Chat</span>
+                </a>
+                <!-- add button for change password -->
                 <a href="{% url 'users:change_password' %}" class="change-password-link">
-                    <i class="fas fa-key"></i> Change Password
+                    <i class="fas fa-key"></i> <span>Change Password</span>
                 </a>
                 <a href="#" class="logout-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                 </a>
             </div>
         </div>
+
+        <!-- Main Content -->
         <div class="main-content">
             <div class="tasks-banner">
                 <h2>📋 My Tasks</h2>
@@ -167,7 +180,6 @@
                         </form>
                         {% endif %}
                     </div>
-
                     {% endfor %}
                     {% else %}
                     📋 No tasks available
@@ -195,6 +207,7 @@
             </div>
         </div>
     </div>
+
     <script src="{% static 'js/user.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -255,26 +268,40 @@
 
         // Function to filter tasks by status
         function filterTasks(status) {
-            console.log("Filtering tasks by status:", status); // Debugging
+            console.log("Filtering tasks by status:", status);
             const tasks = document.querySelectorAll('.task-card');
+            const filterLinks = document.querySelectorAll('.filter-link');
+            
+            // Update active filter link
+            filterLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-filter') === status) {
+                    link.classList.add('active');
+                }
+            });
+            
             tasks.forEach(task => {
                 const taskStatus = task.getAttribute('data-status');
                 if (status === 'all' || taskStatus === status) {
                     task.style.display = 'block';
+                    task.style.animation = 'fadeIn 0.3s ease-in';
                 } else {
                     task.style.display = 'none';
                 }
             });
+            
+            // Close sidebar on mobile after filter
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
         }
 
         // Function to parse deadline
         function parseDeadline(deadline) {
-            // إذا كان التاريخ بتنسيق ISO (مثل "2025-03-28T08:32")
             if (deadline.includes("T")) {
                 return new Date(deadline);
             }
 
-            // إذا كان التاريخ بتنسيق نصي (مثل "March 28, 2025, 8:32 a.m.")
             const months = {
                 "January": 0, "February": 1, "March": 2, "April": 3, "May": 4, "June": 5,
                 "July": 6, "August": 7, "September": 8, "October": 9, "November": 10, "December": 11
@@ -289,7 +316,6 @@
             const minute = parseInt(timeParts[1], 10);
             const period = parts[4];
 
-            // Convert to 24-hour format
             if (period === "p.m." && hour !== 12) {
                 hour += 12;
             } else if (period === "a.m." && hour === 12) {
@@ -333,6 +359,8 @@
 
             if (timeRemaining <= 0) {
                 countdownElement.textContent = "Deadline passed!";
+                countdownElement.style.color = "#e74c3c";
+                countdownElement.style.fontWeight = "600";
                 return;
             }
 
@@ -341,20 +369,45 @@
             const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-            countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            // Format countdown for mobile
+            if (window.innerWidth <= 600) {
+                if (days > 0) {
+                    countdownElement.textContent = `${days}d ${hours}h`;
+                } else if (hours > 0) {
+                    countdownElement.textContent = `${hours}h ${minutes}m`;
+                } else {
+                    countdownElement.textContent = `${minutes}m ${seconds}s`;
+                }
+            } else {
+                countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+            
+            // Add warning colors for urgent tasks
+            if (timeRemaining < 24 * 60 * 60 * 1000) { // Less than 24 hours
+                countdownElement.style.color = "#e74c3c";
+                countdownElement.style.fontWeight = "600";
+            } else if (timeRemaining < 3 * 24 * 60 * 60 * 1000) { // Less than 3 days
+                countdownElement.style.color = "#f39c12";
+                countdownElement.style.fontWeight = "500";
+            }
         }
 
         // Function to initialize countdowns
         function initializeCountdowns() {
             document.querySelectorAll('.task-card').forEach(task => {
-                const taskId = task.querySelector('span[id^="countdown-"]').id.split('-')[1];
-                const deadline = task.querySelector('span[id^="deadline-"]').textContent.trim();
+                const countdownElement = task.querySelector('span[id^="countdown-"]');
+                const deadlineElement = task.querySelector('span[id^="deadline-"]');
                 
-                // Initial update
-                updateCountdown(taskId, deadline);
-                
-                // Set interval and store the ID
-                countdownIntervals[taskId] = setInterval(() => updateCountdown(taskId, deadline), 1000);
+                if (countdownElement && deadlineElement) {
+                    const taskId = countdownElement.id.split('-')[1];
+                    const deadline = deadlineElement.textContent.trim();
+                    
+                    // Initial update
+                    updateCountdown(taskId, deadline);
+                    
+                    // Set interval and store the ID
+                    countdownIntervals[taskId] = setInterval(() => updateCountdown(taskId, deadline), 1000);
+                }
             });
         }
 
@@ -368,7 +421,7 @@
 
         // Function to confirm task completion using SweetAlert2
         function completeTask(event, taskId) {
-            event.preventDefault(); // Prevent the form from submitting immediately
+            event.preventDefault();
 
             Swal.fire({
                 title: 'Are you sure?',
@@ -429,81 +482,110 @@
             });
         }
 
+        // Hamburger Menu Functionality
+        function openSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && hamburgerMenu && sidebarOverlay) {
+                sidebar.classList.add('active');
+                hamburgerMenu.classList.add('active');
+                sidebarOverlay.style.display = 'block';
+                document.body.classList.add('sidebar-open');
+                hamburgerMenu.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && hamburgerMenu && sidebarOverlay) {
+                sidebar.classList.remove('active');
+                hamburgerMenu.classList.remove('active');
+                sidebarOverlay.style.display = 'none';
+                document.body.classList.remove('sidebar-open');
+                hamburgerMenu.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        // Search function
+        function searchTasks(query) {
+            const tasks = document.querySelectorAll('.task-card');
+            const searchTerm = query.toLowerCase();
+            
+            tasks.forEach(task => {
+                const title = task.querySelector('h3').textContent.toLowerCase();
+                const description = task.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    task.style.display = 'block';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
+        }
+
         // Run the function when the page loads
         window.onload = function () {
             initializeCountdowns();
             hideMessages();
         };
 
-        // Hamburger menu toggle
-        (function() {
-            var hamburgerMenu = document.getElementById('hamburger-menu');
-            var sidebarMenu = document.querySelector('.sidebar');
-            var sidebarOverlay = document.getElementById('sidebar-overlay');
-            if (hamburgerMenu && sidebarMenu && sidebarOverlay) {
-                hamburgerMenu.addEventListener('click', function() {
-                    sidebarMenu.classList.toggle('active');
-                    if (sidebarMenu.classList.contains('active')) {
-                        sidebarOverlay.style.display = 'block';
-                        sidebarOverlay.removeAttribute('aria-hidden');
-                        sidebarOverlay.removeAttribute('inert');
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            
+            // Hamburger menu click event
+            if (hamburgerMenu) {
+                hamburgerMenu.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar.classList.contains('active')) {
+                        closeSidebar();
                     } else {
-                        sidebarOverlay.style.display = 'none';
-                        sidebarOverlay.setAttribute('aria-hidden', 'true');
-                        sidebarOverlay.setAttribute('inert', '');
-                    }
-                    hamburgerMenu.setAttribute('aria-expanded', sidebarMenu.classList.contains('active'));
-                });
-                sidebarOverlay.addEventListener('click', function() {
-                    sidebarMenu.classList.remove('active');
-                    sidebarOverlay.style.display = 'none';
-                    sidebarOverlay.setAttribute('aria-hidden', 'true');
-                    sidebarOverlay.setAttribute('inert', '');
-                    hamburgerMenu.setAttribute('aria-expanded', 'false');
-                });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && sidebarMenu.classList.contains('active')) {
-                        sidebarMenu.classList.remove('active');
-                        sidebarOverlay.style.display = 'none';
-                        sidebarOverlay.setAttribute('aria-hidden', 'true');
-                        sidebarOverlay.setAttribute('inert', '');
-                        hamburgerMenu.setAttribute('aria-expanded', 'false');
+                        openSidebar();
                     }
                 });
             }
-        })();
+            
+            // Overlay click to close sidebar
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    closeSidebar();
+                });
+            }
+            
+            // Escape key to close sidebar
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeSidebar();
+                }
+            });
+            
+            // Close sidebar when clicking on links (mobile only)
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 900) {
+                        closeSidebar();
+                    }
+                });
+            });
+            
+            // Close sidebar on window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 900) {
+                    closeSidebar();
+                }
+            });
+        });
     </script>
-
-    <!-- Add overlay for mobile sidebar -->
-    <div class="sidebar-overlay" id="sidebar-overlay" style="display:none;"></div>
-
-    <!-- Wrap main content for better padding on all screens -->
-    <div class="responsive-container" style="max-width:1200px;margin:0 auto;padding:0 2vw;">
-        <!-- ... existing dashboard-container and content ... -->
-    </div>
-
-    <style>
-    /* Overlay for mobile sidebar */
-    .sidebar-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(44,62,80,0.35);
-        z-index: 1999;
-        transition: opacity 0.3s;
-    }
-    @media (min-width: 901px) {
-        .sidebar-overlay { display: none !important; }
-    }
-
-    /* Responsive container for main content */
-    .responsive-container { max-width: 1200px; margin: 0 auto; padding: 0 2vw; }
-
-    /* Hamburger focus/active state */
-    .hamburger:focus, .hamburger:active {
-        outline: 2px solid #3498db;
-        outline-offset: 2px;
-    }
-    </style>
 </body>
 
 </html>
