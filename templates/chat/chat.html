@@ -524,10 +524,10 @@
                 if (chatSocket) {
                     chatSocket.close();
                 }
+                const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
                 chatSocket = new WebSocket(
-                    'ws://' + window.location.host + '/ws/chat/' + encodeURIComponent(roomName) + '/'
+                    protocol + window.location.host + '/ws/chat/' + encodeURIComponent(roomName) + '/'
                 );
-
                 chatSocket.onopen = function(e) {
                     console.log('WebSocket connection opened for room:', roomName);
                 };
