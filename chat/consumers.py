@@ -17,7 +17,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        print(f"Connecting to group: {self.room_group_name} with channel: {self.channel_name}")
+        print(f"Connecting to group: {self.room_group_name}")
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -27,34 +27,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = self.scope["user"]
             if user.is_authenticated:
                 if user.role == 'manager':
-                    print(f"Manager {user.email} joining manager_notifications group with channel: {self.channel_name}")
+                    print(f"Manager {user.email} joining manager_notifications group")
                     await self.channel_layer.group_add(
                         'manager_notifications',
                         self.channel_name
                     )
-                    # Fetch and send online status of all employees when manager connects
-                    employees = await sync_to_async(list)(User.objects.filter(role='employee'))
-                    for employee in employees:
-                        await self.channel_layer.group_send(
-                            'manager_notifications',
-                            {
-                                'type': 'user_status',
-                                'email': employee.email,
-                                'status': 'online' if employee.is_online else 'offline',
-                                'channel': self.channel_name
-                            }
-                        )
                 elif user.role == 'employee':
-                    user.is_online = True
-                    await sync_to_async(user.save)()
                     print(f"Employee {user.email} going online")
                     await self.channel_layer.group_send(
                         'manager_notifications',
                         {
                             'type': 'user_status',
                             'email': user.email,
-                            'status': 'online',
-                            'channel': self.channel_name
+                            'status': 'online'
                         }
                     )
         except Exception as e:
@@ -64,7 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         if hasattr(self, 'room_group_name'):
-            print(f"Disconnecting from group: {self.room_group_name} with channel: {self.channel_name}")
+            print(f"Disconnecting from group: {self.room_group_name}")
             await self.channel_layer.group_discard(
                 self.room_group_name,
                 self.channel_name
@@ -72,16 +57,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             user = self.scope["user"]
             if user.is_authenticated and user.role == 'employee':
-                user.is_online = False
-                await sync_to_async(user.save)()
                 print(f"Employee {user.email} going offline")
                 await self.channel_layer.group_send(
                     'manager_notifications',
                     {
                         'type': 'user_status',
                         'email': user.email,
-                        'status': 'offline',
-                        'channel': self.channel_name
+                        'status': 'offline'
                     }
                 )
             elif user.is_authenticated and user.role == 'manager':
@@ -158,7 +140,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def user_status(self, event):
-        print(f"Sending user_status: {event['email']} is {event['status']} to channel: {event.get('channel', 'N/A')}")
+        print(f"Sending user_status: {event['email']} is {event['status']}")
         await self.send(text_data=json.dumps({
             'type': 'user_status',
             'email': event['email'],

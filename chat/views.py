@@ -128,7 +128,7 @@ def mark_read(request):
 
 @login_required
 def unread_counts(request):
-    print(f"User: {request.user.email}, Role: {request.user.role}, Authenticated: {request.user.is_authenticated}")
+    print(f"User: {request.user}, Role: {request.user.role}, Authenticated: {request.user.is_authenticated}")
     if not request.user.is_authenticated or request.user.role.lower() != 'manager':
         print(f"Access denied for user {request.user.email}: Role is {request.user.role}")
         return JsonResponse({'error': 'Unauthorized'}, status=403)

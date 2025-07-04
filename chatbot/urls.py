@@ -1,4 +1,5 @@
 from django.urls import path
+from .views_auth import CustomObtainAuthToken
 from . import views
 
 app_name = 'chatbot'
@@ -15,5 +16,11 @@ urlpatterns = [
     path('tasks-for-user/<str:username>/', views.tasks_for_user, name='tasks_for_user'),
     path('user-info/<str:username>/', views.user_info, name='user_info'),
     path('reassign-task/<int:task_num>/<str:new_user>/', views.reassign_user, name='reassign_user'),
+    path('task-id/<str:Task_Name>/', views.task_id, name='task_id'),
+
+
+
+    path('api-token-auth/', CustomObtainAuthToken.as_view()),
+
 
 ]

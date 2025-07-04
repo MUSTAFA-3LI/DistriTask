@@ -56,7 +56,26 @@
                                 User</button>
                             <button onclick="askQuestion('User info')" class="quick-btn">ℹ️ User Info</button>
                             <button onclick="askQuestion('Reassign task')" class="quick-btn">🔄 Reassign Task</button>
+                            <button onclick="askQuestion('Find task id')" class="quick-btn">🔎 Find Task ID</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Login form (hidden by default) -->
+            <div id="login-form" style="display:none; margin-top: 30px;">
+                <div class="bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Please log in to use the chatbot:</p>
+                        <input type="email" id="login-email" placeholder="Email"
+                            style="width:90%;margin-bottom:8px;padding:8px;border-radius:6px;border:1px solid #ccc;" /><br>
+                        <input type="password" id="login-password" placeholder="Password"
+                            style="width:90%;margin-bottom:8px;padding:8px;border-radius:6px;border:1px solid #ccc;" /><br>
+                        <button onclick="loginChatbotUser()" class="quick-btn"
+                            style="width:95%;background:#667eea;color:white;">Login</button>
+                        <div id="login-error" style="color:#ff4757;margin-top:8px;"></div>
                     </div>
                 </div>
             </div>
@@ -371,6 +390,8 @@
     let isChatOpen = false;
     let pendingQuestion = null;
     let reassignTaskState = { step: 0, taskNum: null };
+    let chatbotToken = localStorage.getItem('chatbotToken') || null;
+    let chatbotUserEmail = localStorage.getItem('chatbotUserEmail') || null;
 
     function toggleChat() {
         const popup = document.getElementById('chat-popup');
@@ -392,6 +413,61 @@
         if (event.key === 'Enter') {
             sendMessage();
         }
+    }
+
+    function showLoginForm() {
+        document.getElementById('login-form').style.display = '';
+        document.getElementById('chat-input').disabled = true;
+        document.getElementById('send-button').disabled = true;
+    }
+    function hideLoginForm() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('chat-input').disabled = false;
+        document.getElementById('send-button').disabled = false;
+    }
+    function loginChatbotUser() {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        document.getElementById('login-error').innerText = '';
+        if (!email || !password) {
+            document.getElementById('login-error').innerText = 'Please enter both email and password.';
+            return;
+        }
+        // Show loading
+        document.getElementById('login-error').innerText = 'Logging in...';
+        fetch('/chatbot/api-token-auth/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+            .then(res => res.json().then(data => ({ status: res.status, data })))
+            .then(({ status, data }) => {
+                if (status === 200 && data.token) {
+                    chatbotToken = data.token;
+                    chatbotUserEmail = email;
+                    localStorage.setItem('chatbotToken', chatbotToken);
+                    localStorage.setItem('chatbotUserEmail', chatbotUserEmail);
+                    hideLoginForm();
+                    appendMessage('bot', ' Login successful! You can now use the chatbot.');
+                } else {
+                    chatbotToken = null;
+                    localStorage.removeItem('chatbotToken');
+                    document.getElementById('login-error').innerText = data.non_field_errors ? data.non_field_errors.join(' ') : 'Login failed. Please check your credentials.';
+                }
+            })
+            .catch(() => {
+                chatbotToken = null;
+                localStorage.removeItem('chatbotToken');
+                document.getElementById('login-error').innerText = 'Login failed. Please try again.';
+            });
+    }
+    function requireAuthOrLogin() {
+        if (!chatbotToken) {
+            showLoginForm();
+            return false;
+        }
+        hideLoginForm();
+        return true;
     }
 
     function askQuestion(question) {
@@ -428,39 +504,37 @@
             input.value = '';
             input.focus();
             return;
+        } else if (question === 'Find task id') {
+            appendMessage('bot', 'Please enter the task title to find its ID:');
+            pendingQuestion = 'task_id';
+            input.value = '';
+            input.focus();
+            return;
         }
         input.value = question;
         sendMessage();
     }
 
     function sendMessage() {
+        if (!requireAuthOrLogin()) return;
         const input = document.getElementById('chat-input');
         const message = input.value.trim();
-
         if (!message) return;
-
-        // Add user message
         appendMessage('user', message);
         input.value = '';
-
-        // Show typing indicator
         showTypingIndicator();
-
-        // Handle multi-step reassign task
         if (reassignTaskState.step === 1) {
-            // Got task number, now ask for new user
             reassignTaskState.taskNum = message;
             reassignTaskState.step = 2;
             hideTypingIndicator();
             appendMessage('bot', 'Please enter the new user\'s first name:');
             return;
         } else if (reassignTaskState.step === 2) {
-            // Got new user, call endpoint
             const taskNum = reassignTaskState.taskNum;
             const newUser = message;
             reassignTaskState.step = 0;
             reassignTaskState.taskNum = null;
-            fetch(`/chatbot/reassign-task/${encodeURIComponent(taskNum)}/${encodeURIComponent(newUser)}/`, { method: 'POST' })
+            fetchWithAuth(`/chatbot/reassign-task/${encodeURIComponent(taskNum)}/${encodeURIComponent(newUser)}/`, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     hideTypingIndicator();
@@ -476,13 +550,10 @@
                 });
             return;
         }
-
-        // If we are waiting for extra info, handle it
         if (pendingQuestion) {
             handlePendingQuestion(pendingQuestion, message);
             pendingQuestion = null;
         } else {
-            // Process message and get response
             processMessage(message);
         }
     }
@@ -543,11 +614,10 @@
         }
     }
 
-    // Handle the extra info for category, username, or date
     function handlePendingQuestion(type, value) {
         hideTypingIndicator();
         if (type === 'category') {
-            fetch(`/chatbot/tasks-per-category/${encodeURIComponent(value)}/`)
+            fetchWithAuth(`/chatbot/tasks-per-category/${encodeURIComponent(value)}/`)
                 .then(response => response.json())
                 .then(data => {
                     appendMessage('bot', data.answer);
@@ -556,7 +626,7 @@
                     appendMessage('bot', 'Sorry, I couldn\'t fetch tasks for that category.');
                 });
         } else if (type === 'username') {
-            fetch(`/chatbot/tasks-for-user/${encodeURIComponent(value)}/`)
+            fetchWithAuth(`/chatbot/tasks-for-user/${encodeURIComponent(value)}/`)
                 .then(response => response.json())
                 .then(data => {
                     appendMessage('bot', data.answer);
@@ -565,7 +635,7 @@
                     appendMessage('bot', 'Sorry, I couldn\'t fetch tasks for that user.');
                 });
         } else if (type === 'date') {
-            fetch(`/chatbot/tasks-due-on/?date=${encodeURIComponent(value)}`)
+            fetchWithAuth(`/chatbot/tasks-due-on/?date=${encodeURIComponent(value)}`)
                 .then(response => response.json())
                 .then(data => {
                     appendMessage('bot', data.answer);
@@ -574,13 +644,22 @@
                     appendMessage('bot', 'Sorry, I couldn\'t fetch tasks for that date.');
                 });
         } else if (type === 'user_info') {
-            fetch(`/chatbot/user-info/${encodeURIComponent(value)}/`)
+            fetchWithAuth(`/chatbot/user-info/${encodeURIComponent(value)}/`)
                 .then(response => response.json())
                 .then(data => {
                     appendMessage('bot', data.answer);
                 })
                 .catch(err => {
                     appendMessage('bot', 'Sorry, I couldn\'t fetch user info.');
+                });
+        } else if (type === 'task_id') {
+            fetchWithAuth(`/chatbot/task-id/${encodeURIComponent(value)}/`)
+                .then(response => response.json())
+                .then(data => {
+                    appendMessage('bot', data.answer || `Task ID: ${data.task_id}`);
+                })
+                .catch(err => {
+                    appendMessage('bot', 'Sorry, I couldn\'t find the task ID for that title.');
                 });
         }
     }
@@ -602,11 +681,12 @@
                     <button onclick=\"askQuestion('Tasks for user')\" class='quick-btn'>👤 Tasks For User</button>
                     <button onclick=\"askQuestion('User info')\" class='quick-btn'>ℹ️ User Info</button>
                     <button onclick=\"askQuestion('Reassign task')\" class='quick-btn'>🔄 Reassign Task</button>
+                    <button onclick=\"askQuestion('Find task id')\" class='quick-btn'>🔎 Find Task ID</button>
                 </div>`);
                 return;
             }
             if (lowerMessage.includes('how many tasks') || lowerMessage.includes('total tasks')) {
-                fetch('/chatbot/total-tasks/')
+                fetchWithAuth('/chatbot/total-tasks/')
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -615,7 +695,7 @@
                         appendMessage('bot', 'Sorry, I couldn\'t fetch the task count right now. Please try again later.');
                     });
             } else if (lowerMessage.includes('completed') || lowerMessage.includes('finished')) {
-                fetch('/chatbot/completed-tasks/')
+                fetchWithAuth('/chatbot/completed-tasks/')
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -624,7 +704,7 @@
                         appendMessage('bot', 'Sorry, I couldn\'t fetch completed tasks right now. Please try again later.');
                     });
             } else if (lowerMessage.includes('delayed') || lowerMessage.includes('overdue')) {
-                fetch('/chatbot/delayed-tasks/')
+                fetchWithAuth('/chatbot/delayed-tasks/')
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -633,7 +713,7 @@
                         appendMessage('bot', 'Sorry, I couldn\'t fetch delayed tasks right now. Please try again later.');
                     });
             } else if (lowerMessage.includes('top employees') || lowerMessage.includes('best employees') || lowerMessage.includes('top performers')) {
-                fetch('/chatbot/top-employees/')
+                fetchWithAuth('/chatbot/top-employees/')
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -642,7 +722,7 @@
                         appendMessage('bot', 'Sorry, I couldn\'t fetch top employees data right now. Please try again later.');
                     });
             } else if (lowerMessage.includes('completion rate')) {
-                fetch('/chatbot/completion-rate/')
+                fetchWithAuth('/chatbot/completion-rate/')
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -652,7 +732,7 @@
                     });
             } else if (lowerMessage.startsWith('tasks due on:')) {
                 const date = message.split(':')[1].trim();
-                fetch(`/chatbot/tasks-due-on/?date=${encodeURIComponent(date)}`)
+                fetchWithAuth(`/chatbot/tasks-due-on/?date=${encodeURIComponent(date)}`)
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -661,7 +741,7 @@
                         appendMessage('bot', 'Sorry, I couldn\'t fetch tasks for that date.');
                     });
             } else if (lowerMessage.includes('overdue tasks')) {
-                fetch('/chatbot/overdue-tasks/')
+                fetchWithAuth('/chatbot/overdue-tasks/')
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -671,7 +751,7 @@
                     });
             } else if (lowerMessage.startsWith('tasks in category:')) {
                 const category = message.split(':')[1].trim();
-                fetch(`/chatbot/tasks-per-category/${encodeURIComponent(category)}/`)
+                fetchWithAuth(`/chatbot/tasks-per-category/${encodeURIComponent(category)}/`)
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -681,7 +761,7 @@
                     });
             } else if (lowerMessage.startsWith('tasks for user:')) {
                 const username = message.split(':')[1].trim();
-                fetch(`/chatbot/tasks-for-user/${encodeURIComponent(username)}/`)
+                fetchWithAuth(`/chatbot/tasks-for-user/${encodeURIComponent(username)}/`)
                     .then(response => response.json())
                     .then(data => {
                         appendMessage('bot', data.answer);
@@ -693,6 +773,17 @@
                 appendMessage('bot', 'Hello! 👋 How can I assist you with your tasks today?');
             } else if (lowerMessage.includes('help')) {
                 appendMessage('bot', 'I can help you with: 📊 Total tasks, ✅ Completed tasks, ⏰ Delayed tasks, 🏆 Top employees, 📈 Completion rate, 📅 Tasks due on a date, 🚨 Overdue tasks, 🗂️ Tasks per category, 👤 Tasks for user. Just ask!');
+            } else if (lowerMessage.startsWith('task id for:')) {
+                const title = message.split(':')[1].trim();
+                fetchWithAuth(`/chatbot/task-id/${encodeURIComponent(title)}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        appendMessage('bot', data.answer || `Task ID: ${data.task_id}`);
+                    })
+                    .catch(err => {
+                        appendMessage('bot', 'Sorry, I couldn\'t find the task ID for that title.');
+                    });
+                return;
             } else {
                 appendMessage('bot', 'I\'m still learning! For now, I can help with task statistics and employee performance. Try asking about "total tasks", "completed tasks", "delayed tasks", "top employees", "completion rate", "tasks due on", "overdue tasks", "tasks per category", or "tasks for user".');
             }
@@ -741,4 +832,33 @@
             toggleChat();
         }
     });
+
+    // On load, check if token exists, else show login
+    window.addEventListener('DOMContentLoaded', function () {
+        if (!chatbotToken) {
+            showLoginForm();
+        } else {
+            hideLoginForm();
+        }
+    });
+
+    // --- fetchWithAuth helper ---
+    function fetchWithAuth(url, options = {}) {
+        if (!chatbotToken) {
+            showLoginForm();
+            return Promise.reject('Not authenticated');
+        }
+        options.headers = options.headers || {};
+        options.headers['Authorization'] = 'Token ' + chatbotToken;
+        return fetch(url, options).then(res => {
+            if (res.status === 401) {
+                chatbotToken = null;
+                localStorage.removeItem('chatbotToken');
+                showLoginForm();
+                appendMessage('bot', '🔒 Session expired. Please log in again.');
+                throw new Error('Unauthorized');
+            }
+            return res;
+        });
+    }
 </script>

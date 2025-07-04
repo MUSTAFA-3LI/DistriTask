@@ -165,7 +165,7 @@ def reset_password(request):
         confirm = request.POST['confirm_password']
         if new_password != confirm:
             messages.error(request, 'Passwords do not match.')
-            return redirect('reset_password')
+            return redirect('users:reset_password')
 
         user = User.objects.get(id=user_id)
         user.password = make_password(new_password)

@@ -211,30 +211,6 @@
     <script src="{% static 'js/user.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Function to search tasks
-        function searchTasks(searchTerm) {
-            const tasks = document.querySelectorAll('.task-card');
-            searchTerm = searchTerm.toLowerCase();
-
-            tasks.forEach(task => {
-                const title = task.querySelector('h3').textContent.toLowerCase();
-                const description = task.querySelector('p').textContent.toLowerCase();
-                const assignedTo = task.querySelector('p:nth-child(3)').textContent.toLowerCase();
-                const priority = task.querySelector('p:nth-child(4)').textContent.toLowerCase();
-                const status = task.querySelector('p:nth-child(5)').textContent.toLowerCase();
-
-                if (title.includes(searchTerm) ||
-                    description.includes(searchTerm) ||
-                    assignedTo.includes(searchTerm) ||
-                    priority.includes(searchTerm) ||
-                    status.includes(searchTerm)) {
-                    task.style.display = 'block';
-                } else {
-                    task.style.display = 'none';
-                }
-            });
-        }
-
         // Function to hide messages after 5 seconds
         function hideMessages() {
             const messages = document.querySelectorAll('.alert');

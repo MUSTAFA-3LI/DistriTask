@@ -50,9 +50,13 @@ INSTALLED_APPS = [
     'tasks',
     'chatbot',
     'rest_framework',
-    
-    
-]
+    'rest_framework.authtoken',
+    ]
+
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailBackend',
+    ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -65,21 +69,14 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-#     #this for global authentication if need auth for specific end point write in view
-#     #for basic auth
-#    'DEFAULT_AUTHENTICATION_CLASSES': (
-#     'rest_framework.authentication.BasicAuthentication', #require username and password
-# ),
-#     #for token auth
-#    'DEFAULT_AUTHENTICATION_CLASSES': (
-#     'rest_framework.authentication.TokenAuthentication',
-# ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#     'rest_framework.permissions.IsAuthenticated',       #any one with user and password have full access
-# ),
-#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-#     'PAGE_SIZE': 10
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
+
 
 
 ROOT_URLCONF = 'TaskManager.urls'
@@ -108,10 +105,7 @@ ASGI_APPLICATION = 'TaskManager.asgi.application'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
 
@@ -148,7 +142,7 @@ DATABASES = {
 }
 
 
-# FOR DOCKER AND KUBERNETES DATABASE 
+# FOR DOCKER DATABASE
 
 # DATABASES = {
 #     'default': {
@@ -156,8 +150,8 @@ DATABASES = {
 #         'NAME': os.getenv('MYSQL_DATABASE'),
 #         'USER': os.getenv('MYSQL_USER'),
 #         'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': os.getenv('DB_PORT'),
+#         'HOST': 'db',
+#         'PORT': '3306',
 #         'OPTIONS': {
 #             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
 #         },
@@ -176,9 +170,6 @@ DATABASES = {
 #         'PASSWORD': os.getenv('MYSQL_PASSWORD'),
 #         'HOST': os.getenv('DB_HOST'),
 #         'PORT': os.getenv('DB_PORT'),
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#         },
 #     }
 # }
 

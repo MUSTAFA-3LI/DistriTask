@@ -1,118 +1,201 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from .models import User
+import datetime
 
 class UserViewsTests(TestCase):
     def setUp(self):
-        """
-        Set up test data before each test.
-        """
-        # Create a manager user
+        self.client = Client()
+
         self.manager = User.objects.create(
             first_name="Manager",
             last_name="User",
             email="manager@example.com",
             role="manager",
-            password=make_password("managerpassword")  # Hashed password
+            password=make_password("managerpassword")
         )
 
-        # Create an employee user
         self.employee = User.objects.create(
             first_name="Employee",
             last_name="User",
             email="employee@example.com",
             role="employee",
-            password=make_password("employeepassword")  # Hashed password
+            password=make_password("employeepassword")
         )
 
-        # Set up the test client
-        self.client = Client()
-
     def test_login_view(self):
-        """
-        Test the login view.
-        """
-        # Test successful login for manager
+        # Success - Manager
         response = self.client.post(reverse('users:login'), {
             'email': 'manager@example.com',
             'password': 'managerpassword'
         })
-        self.assertEqual(response.status_code, 302)  # Check for redirection
-        self.assertRedirects(response, reverse('tasks:manager_tasks'))  # Check redirection to manager tasks page
+        self.assertRedirects(response, reverse('tasks:manager_tasks'))
 
-        # Test successful login for employee
+        # Success - Employee
         response = self.client.post(reverse('users:login'), {
             'email': 'employee@example.com',
             'password': 'employeepassword'
         })
-        self.assertEqual(response.status_code, 302)  # Check for redirection
-        self.assertRedirects(response, reverse('tasks:employee_tasks'))  # Check redirection to employee tasks page
+        self.assertRedirects(response, reverse('tasks:employee_tasks'))
 
-        # Test invalid password
+        # Invalid password
         response = self.client.post(reverse('users:login'), {
             'email': 'manager@example.com',
-            'password': 'wrongpassword'
+            'password': 'wrong'
         })
-        self.assertEqual(response.status_code, 200)  # Check that the page reloads
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), 'Invalid password')  # Check error message
+        self.assertContains(response, "Invalid password")
 
-        # Test non-existent user
+        # User not found
         response = self.client.post(reverse('users:login'), {
-            'email': 'nonexistent@example.com',
+            'email': 'nouser@example.com',
             'password': 'password'
         })
-        self.assertEqual(response.status_code, 200)  # Check that the page reloads
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), 'User not found')  # Check error message
+        self.assertContains(response, "User not found")
 
     def test_register_view(self):
-        """
-        Test the register view.
-        """
-        # Test successful registration
+        # Success
         response = self.client.post(reverse('users:register'), {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-            'phone_number': '1234567890',
-            'birthday': '1990-01-01',
+            'first_name': 'Ali',
+            'last_name': 'Saleh',
+            'email': 'ali@example.com',
+            'phone_number': '0100000000',
+            'birthday': '2000-01-01',
             'role': 'employee',
-            'password': 'password123',
-            'confirm_password': 'password123'
+            'category': 'Backend',
+            'password': 'pass1234',
+            'confirm_password': 'pass1234',
         })
-        self.assertEqual(response.status_code, 302)  # Check for redirection
-        self.assertRedirects(response, reverse('users:login'))  # Check redirection to login page
-        self.assertTrue(User.objects.filter(email='john@example.com').exists())  # Check that the user was created
+        self.assertRedirects(response, reverse('users:login'))
+        self.assertTrue(User.objects.filter(email='ali@example.com').exists())
 
-        # Test password mismatch
+        # Passwords don't match
         response = self.client.post(reverse('users:register'), {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'email': 'jane@example.com',
-            'phone_number': '0987654321',
-            'birthday': '1995-01-01',
+            'first_name': 'Samir',
+            'last_name': 'Said',
+            'email': 'samir@example.com',
+            'phone_number': '0111111111',
+            'birthday': '2001-02-02',
             'role': 'employee',
-            'password': 'password123',
-            'confirm_password': 'differentpassword'
+            'category': 'DevOps',
+            'password': 'pass1234',
+            'confirm_password': 'diff1234',
         })
-        self.assertEqual(response.status_code, 200)  # Check that the page reloads
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), 'Passwords do not match')  # Check error message
+        self.assertContains(response, 'Passwords do not match')
 
-        # Test email already exists
+        # Email exists
         response = self.client.post(reverse('users:register'), {
-            'first_name': 'Manager',
+            'first_name': 'Copy',
             'last_name': 'User',
-            'email': 'manager@example.com',  # Existing email
-            'phone_number': '1234567890',
-            'birthday': '1990-01-01',
+            'email': 'manager@example.com',
+            'phone_number': '0123456789',
+            'birthday': '1980-12-12',
             'role': 'manager',
-            'password': 'password123',
-            'confirm_password': 'password123'
+            'category': 'Frontend',
+            'password': 'pass1234',
+            'confirm_password': 'pass1234',
         })
-        self.assertEqual(response.status_code, 200)  # Check that the page reloads
+        self.assertContains(response, 'Email already exists')
+
+    def test_change_password_view(self):
+        # Login first
+        session = self.client.session
+        session['user_id'] = self.manager.id
+        session.save()
+
+        # Wrong old password
+        response = self.client.post(reverse('users:change_password'), {
+            'old_password': 'wrong',
+            'new_password': 'newpass123',
+            'confirm_password': 'newpass123'
+        })
+        self.assertContains(response, 'Old password is incorrect.')
+
+        # Passwords don’t match
+        response = self.client.post(reverse('users:change_password'), {
+            'old_password': 'managerpassword',
+            'new_password': 'abc123',
+            'confirm_password': 'different'
+        })
+        self.assertContains(response, 'New passwords do not match.')
+
+        # Success
+        response = self.client.post(reverse('users:change_password'), {
+            'old_password': 'managerpassword',
+            'new_password': 'newpass123',
+            'confirm_password': 'newpass123'
+        })
+        self.assertRedirects(response, reverse('users:login'))
+
+    def test_send_otp_view(self):
+        # Existing email
+        response = self.client.post(reverse('users:send_otp'), {
+            'email': 'employee@example.com'
+        })
+        self.assertRedirects(response, reverse('users:verify_otp'))
+        user = User.objects.get(email='employee@example.com')
+        self.assertIsNotNone(user.reset_otp)
+
+        # Non-existent email
+        response = self.client.post(reverse('users:send_otp'), {
+            'email': 'notfound@example.com'
+        }, follow=True)
+
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), 'Email already exists')  # Check error message
+        self.assertEqual(str(messages[0]), 'Email not found.')
+
+    def test_verify_otp_view(self):
+        # Set OTP manually
+        self.employee.reset_otp = '123456'
+        self.employee.otp_expiry = timezone.now() + datetime.timedelta(minutes=5)
+        self.employee.save()
+
+        # Correct OTP
+        response = self.client.post(reverse('users:verify_otp'), {
+            'email': 'employee@example.com',
+            'otp': '123456'
+        })
+        self.assertRedirects(response, reverse('users:reset_password'))
+
+        # Expired OTP
+        self.employee.otp_expiry = timezone.now() - datetime.timedelta(minutes=1)
+        self.employee.save()
+        response = self.client.post(reverse('users:verify_otp'), {
+            'email': 'employee@example.com',
+            'otp': '123456'
+        })
+        self.assertRedirects(response, reverse('users:send_otp'))
+
+        # Invalid OTP
+        response = self.client.post(reverse('users:verify_otp'), {
+            'email': 'employee@example.com',
+            'otp': '000000'
+        })
+        self.assertContains(response, 'Invalid OTP.')
+
+    def test_reset_password_view(self):
+        # Set session and user
+        self.employee.reset_otp = '654321'
+        self.employee.otp_expiry = timezone.now() + datetime.timedelta(minutes=10)
+        self.employee.save()
+        session = self.client.session
+        session['reset_user_id'] = self.employee.id
+        session.save()
+
+        # Password mismatch
+        response = self.client.post(reverse('users:reset_password'), {
+            'new_password': 'new123',
+            'confirm_password': 'wrong'
+        })
+        self.assertRedirects(response, reverse('users:reset_password'))
+
+        # Password match
+        response = self.client.post(reverse('users:reset_password'), {
+            'new_password': 'new123',
+            'confirm_password': 'new123'
+        })
+        self.assertRedirects(response, reverse('users:login'))
+        updated_user = User.objects.get(id=self.employee.id)
+        self.assertIsNone(updated_user.reset_otp)

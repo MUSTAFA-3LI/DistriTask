@@ -11,10 +11,12 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+    
 
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
@@ -32,7 +34,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     category = models.CharField(max_length=100, blank=True, null=True)
     reset_otp = models.CharField(max_length=6, null=True, blank=True)
     otp_expiry = models.DateTimeField(null=True, blank=True)
-    is_online = models.BooleanField(default=False)  # إضافة حقل لحالة الاتصال
 
     # الحقول المطلوبة للـ Django Auth
     is_active = models.BooleanField(default=True)
@@ -46,8 +47,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
-
-    def update_online_status(self, status):
-        """تعديل حالة الاتصال يدويًا"""
-        self.is_online = status
-        self.save()

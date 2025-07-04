@@ -69,7 +69,7 @@ def completion_rate(request):
 #tasks_due_on_date
 @api_view(['GET'])
 def tasks_due_on_date(request):
-    date_str = request.GET.get('date')  # expects format YYYY-MM-DD
+    date_str = request.GET.get('date')  # format YYYY-MM-DD
     try:
         due_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     except (ValueError, TypeError):
@@ -93,6 +93,16 @@ def tasks_per_category(request, category_name):
         return Response({"answer": f"No tasks found in category '{category_name}'."})
     
     return Response({"answer": f"There are {count} tasks in the '{category_name}' category."})
+
+#Get task ID Using Task Name
+@api_view(['GET'])
+def task_id(request, Task_Name):
+    task = Task.objects.filter(title__iexact=Task_Name).first()
+
+    if task :
+        return Response({"answer": f"ID is '{task.id}'."})
+    
+    return Response({"answer": f"There are no task with this titls"})
 
 #task count for each user
 @api_view(['GET'])
