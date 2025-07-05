@@ -1,96 +1,312 @@
-# Task Manager App
+# DistriTask
 
-## Project Overview
+A comprehensive web-based task management system designed to streamline organizational workflow and enhance team collaboration. DistriTask supports two distinct user roles: Manager and Employee, with advanced features including real-time chat, AI chatbot assistance, and secure API authentication.
 
-The **Task Manager App** is a web-based application designed to help managers and employees track tasks efficiently. It allows managers to create, update, and delete tasks, while employees can view and update their assigned tasks.
+<img width="1903" height="915" alt="Image" src="https://github.com/user-attachments/assets/3ab8a439-69f7-4891-9129-9c648f715426" />
 
-## Installation and Setup
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Development & Testing](#development--testing)
+- [Core Features](#core-features)
+- [API Overview](#api-overview)
+- [DevOps & Cloud Infrastructure](#devops--cloud-infrastructure)
+
+## Key Features
+
+- **Secure Authentication**: Role-based access for Managers and Employees
+- **Intelligent Task Assignment**: Automatic task distribution based on workload
+- **Real-Time Chat**: Instant messaging with WebSocket support
+- **AI-Powered Chatbot**: Natural language interaction for task queries and automation
+- **Comprehensive Analytics**: Dashboards for task completion and performance tracking
+- **Mobile-Responsive Design**: Seamless experience across devices
+
+## Technologies Used
+
+### Backend
+
+- **Python 3.x**
+- **Django 4.x**
+- **Django REST Framework**
+- **Django Channels** (WebSockets)
+- **Celery** (Task Queue)
+- **Redis** (Message Broker & Cache)
+
+### Database
+
+- **MySQL** or **SQLite**
+
+### Authentication
+
+- **Django's built-in authentication**
+- **Token authentication** for API access
+
+### Testing
+
+- **pytest**
+- **Django test framework**
+
+### Frontend
+
+- **HTML5**
+- **CSS3**
+- **JavaScript**
+- **Font Awesome (icon library )**
+- **SweetAlert2 (Alert message library)**
+
+### DevOps & Cloud
+
+- **Docker & Docker Compose** – For containerization and managing multi-service environments
+
+- **GitHub Actions** – For building automated CI/CD pipelines
+
+- **Terraform** – Infrastructure as Code (IaC) to provision cloud resources
+
+- **AWS EC2, EBS, IAM, Shield** – Cloud compute, storage, security roles, and DDoS protection
+
+- **Ansible** – For automated server configuration and environment setup
+
+- **Kubernetes** – For container orchestration and deployment testing in local clusters
+
+- **AWS CloudWatch** – For monitoring, alerting, and performance dashboards
+
+## Installation
+
+Follow these steps to set up and run DistriTask locally:
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/MUSTAFA-3LI/Fork_TaskManager
-python -m venv venv
-source venv/bin/activate # For Linux
-venv\Scripts\activate    # For Windows
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+git clone https://github.com/MUSTAFA-3LI/DistriTask
+cd DistriTask
 ```
 
-## User Guide
+### 2. Create virtual environment
 
-### Manager Role
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-**Logging In**: Use manager credentials to access the admin dashboard.
+### 3. Install dependencies
 
-![Image](https://github.com/user-attachments/assets/1ad5d251-2ca2-4081-bd85-b767c171bdb4)
+```bash
+pip install -r requirements.txt
+```
 
-**Manage Tasks**:
+### 4. Configure settings
 
-1. Create, update, and delete tasks.
+Update `TaskManager/settings.py` with:
 
-2. Assign tasks to employees.
+- Database settings (SQLite or MySQL)
+- Email backend credentials
+- Redis settings for Celery and Channels
+- Static and media file configurations
 
-3. Filter tasks by status (completed, delayed, in progress).
+### 5. Set up database
 
-**Monitor Employees**:
+```bash
+python3 manage.py migrate
+```
 
-1. View employee task statistics.
-2. Track task completion rates.
+### 6. Create superuser
 
-![Image](https://github.com/user-attachments/assets/da9aa6c5-74f0-41e7-b9ab-28e1bfacc74b)
+```bash
+python3 manage.py createsuperuser
+```
 
-### Employee Role
+## Development & Testing
 
-1. **Logging In**: Use employee credentials to access the dashboard.
+Before starting the server, ensure all tests pass to maintain code quality.
 
-2. **View Tasks**: Employees can see their assigned tasks.
+### Running Tests
 
-3. **Update Task Status**: Employees can update the progress of their assigned tasks.
+```bash
+python3 manage.py test
+# or
+pytest
+```
 
-![Image](https://github.com/user-attachments/assets/1ead928e-d503-42ec-909b-6d37b420adea)
+> **Test Coverage**: The project includes comprehensive test coverage for all core functionalities.
 
-### Managing Tasks:
+![Image](https://github.com/user-attachments/assets/2b0e842f-2a02-4c6d-805f-8c873a1c566a)
 
-**Log in as a manager.**
+### Starting Services
 
-**Click the `Add Task` button.**
+Now, you can start the necessary services and the development server:
 
-**Fill in the task details:**
+#### 1. Start Redis server (for Celery and Channels)
 
-1. Title
-2. Description
-3. Priority
-4. Status
-5. Due date
+```bash
+redis-server
+```
 
-**Click `Add` to save the task.**
+#### 2. Start Celery worker (in a new terminal)
 
-![Image](https://github.com/user-attachments/assets/9963cefc-bcb6-4862-b6b2-a73608350935)
+```bash
+celery -A TaskManager worker -l info
+```
 
-## Database Models
+#### 3. Start development server
 
-### User Model
+```bash
+python3 manage.py runserver
+```
 
-1. Represents users (Managers and Employees).
+## Core Features
 
-2. Contains login credentials, roles, and related information like phone number and birthdate.
+### Authentication & User Management
 
-### Task Model
+DistriTask features a robust authentication system allowing users to securely log in and manage their accounts. It supports a custom user model with email-based login, password reset functionality via OTP, and comprehensive role-based access control for Managers and Employees.
 
-**Represents tasks assigned to employees.**
+**Features:**
 
-Includes:
+- **Custom User Model**: Email login and secure password management
+- **Role-Based Access Control**: Distinct permissions for Managers and Employees
+- **Session-Based Login/Logout**: Standard web session management
+- **Token-Based API Authentication**: Secure access for all API interactions
+- **Password Reset**: Via OTP sent to the registered email
+- **CSRF Protection**: Enhanced security against cross-site request forgeries
+- **Automated Deployment: Docker, CI/CD, AWS provisioning**
 
-1. Title: Task name.
-2. Description: Task details.
-3. Priority: Low, Medium, High.
-4. Status: Completed, In Progress and Delayed.
-5. Due Date: Task deadline.
+<img width="1919" height="915" alt="Image" src="https://github.com/user-attachments/assets/82ed96bd-b407-4214-9663-7e871d36d01f" />
+<img width="1917" height="925" alt="Image" src="https://github.com/user-attachments/assets/e2c9ce14-72da-4720-81a0-2f0fd29f41cd" />
+### Intelligent Task Management (Manager View)
 
-## Planned Features
+Managers have full control over task creation, assignment, and monitoring. The system incorporates an intelligent algorithm that automatically assigns tasks to employees based on workload balancing and specific categories, ensuring optimal distribution and efficiency.
 
-1. **Notifications**: Alert users about upcoming task deadlines.
+**Features:**
 
-2. **automatic Task Assignment**: The system will automatically assign tasks to employees based on predefined criteria.
+- **Task Creation, Editing, Deletion**: Full CRUD operations for tasks
+- **Automatic Assignment**: Tasks are intelligently assigned to the employee with the least uncompleted tasks within a given category
+- **Task Status Tracking**: Monitor tasks as pending or completed
+- **Categories & Deadlines**: Organize tasks with categories and strict deadlines
+- **Filtering & Searching**: Easily view tasks by status, assigned employee, or category
+- **Task ID Lookup**: Quickly find tasks by their title
 
-3. **Enhanced User UI**
+<img width="1909" height="921" alt="Image" src="https://github.com/user-attachments/assets/1ab329e7-76d4-4472-a218-8c7ab89f87f9" />
+<img width="1907" height="921" alt="Image" src="https://github.com/user-attachments/assets/3f9c553d-67b5-45cd-847e-9ef2c6d486df" />
+### Employee Task View
+
+Employees are provided with a streamlined interface to view only the tasks assigned to them. They can track the status of their tasks, mark them as completed, and manage their workload effectively within the given deadlines.
+
+**Features:**
+
+- **Personalized Task List**: Employees only see tasks assigned specifically to them
+- **Task Status Updates**: Ability to mark tasks as completed
+- **Deadline Awareness**: Clear visibility of task deadlines
+
+<img width="1920" height="920" alt="Image" src="https://github.com/user-attachments/assets/89676c4f-6f7f-461f-9d2c-0c997f80398a" />
+### Real-Time Communication
+
+DistriTask integrates a WebSocket-based chat system using Django Channels, enabling seamless real-time communication between team members.
+
+**Features:**
+
+- **WebSocket-Based Chat**: Powered by Django Channels for instant messaging
+- **Team Collaboration**: Dedicated chat rooms for different teams or projects
+- **Message History**: Access to past conversations for continuity
+- **Read Status Tracking**: Know when your messages have been seen
+
+<img width="1919" height="925" alt="Image" src="https://github.com/user-attachments/assets/93f093f8-b7ba-47f3-b029-a3268f82088f" />
+### AI Chatbot Assistant
+
+An intelligent chatbot assistant powered by natural language processing provides instant support for task-related queries and automates common operations.
+
+**Features:**
+
+- **Natural Language Processing**: Understands and responds to natural language queries
+- **Task-Related Queries**: Get instant answers on task statuses, deadlines, and details
+- **Quick Actions**: Perform common operations like task reassignment or status updates
+- **Multi-Step Interactions**: Supports complex operations requiring multiple conversational turns
+- **Performance Analytics**: Retrieve statistics on task completion rates, employee performance, and more
+
+<img width="1905" height="915" alt="Image" src="https://github.com/user-attachments/assets/7739e01a-ce94-4f07-b4f9-798e5f0e8428" />
+##  API Overview
+
+### Chatbot API Endpoints (Token Authentication Required)
+
+| Endpoint                       | Method | Description                         |
+| ------------------------------ | ------ | ----------------------------------- |
+| `/chatbot/total-tasks/`        | GET    | Get total task count                |
+| `/chatbot/completed-tasks/`    | GET    | Get completed tasks statistics      |
+| `/chatbot/delayed-tasks/`      | GET    | Get delayed tasks information       |
+| `/chatbot/overdue-tasks/`      | GET    | Get overdue tasks list              |
+| `/chatbot/top-employees/`      | GET    | Get top performing employees        |
+| `/chatbot/completion-rate/`    | GET    | Get overall completion rate         |
+| `/chatbot/tasks-due-on/`       | GET    | Get tasks due on specific date      |
+| `/chatbot/tasks-per-category/` | GET    | Get tasks by category               |
+| `/chatbot/tasks-for-user/`     | GET    | Get tasks assigned to specific user |
+| `/chatbot/user-info/`          | GET    | Get user information                |
+| `/chatbot/task-id/`            | GET    | Get task ID by title                |
+| `/chatbot/reassign-task/`      | POST   | Reassign task to different user     |
+
+### General API Endpoints
+
+DistriTask provides a comprehensive set of RESTful API endpoints built with Django REST Framework, ensuring secure and efficient data exchange for all functionalities. All API endpoints are protected with token authentication and CSRF protection.
+
+| Endpoint                   | Method | Description               |
+| -------------------------- | ------ | ------------------------- |
+| `/chatbot/api-token-auth/` | POST   | Get API token for chatbot |
+
+## DevOps & Cloud Infrastructure
+
+This project includes a complete setup for automated deployment, infrastructure management, and operational reliability.
+
+**Dockerization**
+
+- Built project images for isolated, reproducible deployments.
+
+- Used Docker Compose to orchestrate multiple containers on the same network.
+
+- Containerized Django backend for portable, consistent deployment environments.
+
+**CI/CD Pipelines**
+
+- Created automated GitHub Actions workflows for testing, building, and deploying on every push.
+
+- Built new Docker images and pushed them to Docker Hub.
+
+- Included team notifications for build failures or deployment status.
+
+**Kubernetes Deployment**
+
+- Deployed Dockerized application to local Kubernetes clusters for orchestration testing.
+
+- Managed container scaling, rolling updates, and rollbacks.
+
+**Infrastructure Provisioning (Terraform & AWS)**
+
+- Defined infrastructure as code to provision consistent AWS environments.
+
+- Automated deployment of highly available infrastructure on AWS EC2.
+
+- Managed networking, security groups, and IAM roles with Terraform.
+
+**Security & IAM**
+
+- Configured AWS Security Groups for subnet-level access control.
+
+- Created IAM roles and policies to enforce least-privilege access.
+
+- Used AWS Shield for DDoS protection.
+
+- Secured SSH access and sensitive credentials following best practices.
+
+**Backup & Recovery**
+
+- Used AWS EBS volumes for persistent data storage.
+
+- Configured multi-AZ backups for high availability.
+
+- Automated backup schedules and disaster recovery strategies.
+
+**Monitoring & Logging**
+
+- Integrated AWS CloudWatch for metrics and logs.
+
+- Set up email alerts (e.g., Gmail) for critical events.
+
+- Created dashboards to monitor system health and performance.
