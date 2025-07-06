@@ -16,12 +16,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarms" {
 
   alarm_name          = "high-cpu-${each.key}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "300"
+  period              = "60"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "75"
   alarm_description   = "CPU utilization alarm for ${each.key}"
   alarm_actions       = [aws_sns_topic.project_alerts.arn]
   ok_actions          = [aws_sns_topic.project_alerts.arn]
@@ -40,10 +40,10 @@ resource "aws_cloudwatch_metric_alarm" "health_alarms" {
 
   alarm_name          = "health-check-${each.key}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "1"
   metric_name         = "StatusCheckFailed"
   namespace           = "AWS/EC2"
-  period              = "300"
+  period              = "60"
   statistic           = "Maximum"
   threshold           = "0"
   alarm_description   = "Health check alarm for ${each.key}"
@@ -63,12 +63,12 @@ resource "aws_cloudwatch_metric_alarm" "network_alarms" {
 
   alarm_name          = "high-network-${each.key}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "1"
   metric_name         = "NetworkIn"
   namespace           = "AWS/EC2"
-  period              = "300"
+  period              = "60"
   statistic           = "Average"
-  threshold           = "10000000" # 10MB
+  threshold           = "500000"
   alarm_description   = "High network usage for ${each.key}"
   alarm_actions       = [aws_sns_topic.project_alerts.arn]
 
