@@ -27,3 +27,5 @@ djangorestframework
 daphne
 channels
 channels-redis
+pytest
+pytest-django
