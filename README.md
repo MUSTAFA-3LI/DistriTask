@@ -1,3 +1,13 @@
+## 🚀 Project Features & Skills
+
+![Docker](https://img.shields.io/badge/Dockerization-Built%20images%20&%20Compose-blue)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20Workflows-orange)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Local%20Clusters%20Deployment-blueviolet)
+![Terraform](https://img.shields.io/badge/Infra%20as%20Code-Terraform%20%26%20AWS-green)
+![Security](https://img.shields.io/badge/Security-IAM%20%26%20Best%20Practices-red)
+![Backup](https://img.shields.io/badge/Backup%20&%20Recovery-AWS%20EBS%20%26%20Disaster%20Recovery-yellow)
+![Monitoring](https://img.shields.io/badge/Monitoring-CloudWatch%20%26%20Alerts-lightgrey)
+
 # DistriTask
 
 A comprehensive web-based task management system designed to streamline organizational workflow and enhance team collaboration. DistriTask supports two distinct user roles: Manager and Employee, with advanced features including real-time chat, AI chatbot assistance, and secure API authentication.
