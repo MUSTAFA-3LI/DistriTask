@@ -43,9 +43,7 @@ This repository contains Terraform code to provision a secure, scalable AWS infr
 
 ## **Diagram**
 
-![AWS Architecture](./0-Infrastructure.drawio.png)
-
----
+## <img width="1041" height="941" alt="Image" src="https://github.com/user-attachments/assets/d38f4208-86a2-4e42-b58f-fe9c7f9c06bc" />
 
 ## **Getting Started**
 
