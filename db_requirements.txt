@@ -22,3 +22,10 @@ vine==5.1.0
 wcwidth==0.2.13
 PyMySQL
 cryptography
+gunicorn
+djangorestframework
+daphne
+channels
+channels-redis
+pytest
+pytest-django
