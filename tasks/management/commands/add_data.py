@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 'category': 'Backend',
             },
             {
-                'first_name': 'Yoused',
+                'first_name': 'Yousef',
                 'last_name': 'Mostafa',
                 'email': 'youssifmostafa192@gmail.com',
                 'password': '12345',
@@ -44,14 +44,14 @@ class Command(BaseCommand):
                 'role': 'employee',
                 'category': 'Backend',
             },
-            {
-                'first_name': 'Ahmed',
-                'last_name': 'Hamdy',
-                'email': 'ahmedhandy06@gmail.com',
-                'password': '12345',
-                'role': 'manager',
-                'category': '',
-            },
+            # {
+            #     'first_name': 'Ahmed',
+            #     'last_name': 'Hamdy',
+            #     'email': 'ahmedhandy06@gmail.com',
+            #     'password': '12345',
+            #     'role': 'manager',
+            #     'category': '',
+            # },
         ]
 
         user_objects = {}
